@@ -130,7 +130,7 @@ export default function Jobs() {
             {jobs.map(job => (
               <div key={job.id} style={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: '14px', padding: '20px 22px', transition: 'all .2s', cursor: 'pointer' }}
                 onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 24px rgba(13,59,94,.1)'}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}>
+                onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'} onClick={() => window.location.href = `/jobs/${job.id}`}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
                   <div style={{ fontWeight: '700', fontSize: '16px', color: '#1A1F2E' }}>{job.title}</div>
                   {job.job_type && (
