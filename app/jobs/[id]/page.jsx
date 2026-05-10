@@ -1,8 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useParams } from 'next/navigation'
 import { supabase } from '../../../lib/supabase'
 
-export default function JobDetail({ params }) {
+export default function JobDetail() {
+  const params = useParams()
   const [job, setJob] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -16,11 +18,11 @@ export default function JobDetail({ params }) {
       setJob(data)
       setLoading(false)
     }
-    fetchJob()
-  }, [])
+    if (params.id) fetchJob()
+  }, [params.id])
 
-  if (loading) return <div style={{color:'white',textAlign:'center',padding:'4rem'}}>جاري التحميل...</div>
-  if (!job) return <div style={{color:'white',textAlign:'center',padding:'4rem'}}>الوظيفة غير موجودة</div>
+  if (loading) return <div style={{color:'white',textAlign:'center',padding:'4rem',background:'#0a0a0a',minHeight:'100vh'}}>جاري التحميل...</div>
+  if (!job) return <div style={{color:'white',textAlign:'center',padding:'4rem',background:'#0a0a0a',minHeight:'100vh'}}>الوظيفة غير موجودة</div>
 
   return (
     <main dir="rtl" style={{minHeight:'100vh',background:'#0a0a0a',color:'white',padding:'2rem',fontFamily:'Arial,sans-serif'}}>
