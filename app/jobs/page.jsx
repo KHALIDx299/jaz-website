@@ -8,7 +8,7 @@ export default function Jobs() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({
     title: '', company_name: '', salary: '',
-    job_type: '', location: '', description: ''
+    job_type: '', location: '', description: '', requirements: '', email: '', phone: '', company_details: ''
   })
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -33,7 +33,7 @@ export default function Jobs() {
     if (error) { alert('حدث خطأ: ' + error.message); return }
     setSuccess(true)
     setShowForm(false)
-    setForm({ title: '', company_name: '', salary: '', job_type: '', location: '', description: '' })
+    setForm({ title: '', company_name: '', salary: '', job_type: '', location: '', description: '', requirements: '', email: '', phone: '', company_details: '' })
     fetchJobs()
     setTimeout(() => setSuccess(false), 3000)
   }
@@ -156,3 +156,4 @@ export default function Jobs() {
     </main>
   )
 }
+
