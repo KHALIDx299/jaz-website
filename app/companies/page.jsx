@@ -35,49 +35,60 @@ function CompaniesContent() {
   })
 
   return (
-    <main dir="rtl" style={{minHeight:'100vh',background:'#0a0a0a',color:'white',padding:'2rem',fontFamily:'Arial,sans-serif'}}>
-      <h1 style={{textAlign:'center',fontSize:'2rem',marginBottom:'1rem',color:'#F5A623'}}>الشركات</h1>
+    <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)'}}>
+      <div style={{padding:'40px 20px', textAlign:'center', color:'white'}}>
+        <a href="/" style={{color:'#F5A623', fontSize:'14px', textDecoration:'none'}}>← الرئيسية</a>
+        <h1 style={{fontSize:'2.5rem', fontWeight:'800', margin:'16px 0 8px'}}>شركات جازان</h1>
+        <p style={{opacity:0.8}}>{companies.length} شركة مسجلة</p>
 
-      <div style={{display:'flex',gap:'1rem',marginBottom:'2rem',flexWrap:'wrap',justifyContent:'center'}}>
-        <input
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          placeholder="ابحث عن شركة..."
-          style={{padding:'0.5rem 1rem',borderRadius:'8px',border:'1px solid #333',background:'#111',color:'white',minWidth:'200px'}}
-        />
-        <select
-          value={filter}
-          onChange={e => setFilter(e.target.value)}
-          style={{padding:'0.5rem 1rem',borderRadius:'8px',border:'1px solid #333',background:'#111',color:'white'}}
-        >
-          <option value="">-- اختر قطاع --</option>
-          {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-        </select>
+        <div style={{display:'flex', gap:'1rem', marginTop:'20px', flexWrap:'wrap', justifyContent:'center'}}>
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="ابحث عن شركة..."
+            style={{padding:'10px 16px', borderRadius:'10px', border:'none', background:'rgba(255,255,255,0.15)', color:'white', minWidth:'200px', fontSize:'14px', outline:'none'}}
+          />
+          <select
+            value={filter}
+            onChange={e => setFilter(e.target.value)}
+            style={{padding:'10px 16px', borderRadius:'10px', border:'none', background:'rgba(255,255,255,0.15)', color:'white', fontSize:'14px', outline:'none'}}
+          >
+            <option value="" style={{background:'#0D3B2E'}}>-- اختر قطاع --</option>
+            {categories.map(cat => <option key={cat} value={cat} style={{background:'#0D3B2E'}}>{cat}</option>)}
+          </select>
+          <a href="/add-company" style={{background:'#F5A623', color:'white', border:'none', padding:'10px 24px', borderRadius:'10px', fontWeight:'700', cursor:'pointer', fontSize:'15px', textDecoration:'none'}}>
+            + أضف شركة
+          </a>
+        </div>
       </div>
 
-      {!filter && !search ? (
-        <p style={{textAlign:'center',color:'#aaa',marginTop:'4rem',fontSize:'1.2rem'}}>
-          اختر قطاعاً أو ابحث عن شركة لعرض النتائج
-        </p>
-      ) : loading ? (
-        <p style={{textAlign:'center'}}>جاري التحميل...</p>
-      ) : filtered.length === 0 ? (
-        <p style={{textAlign:'center',color:'#aaa'}}>لا توجد شركات في هذا القطاع</p>
-      ) : (
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))',gap:'1.5rem',maxWidth:'1200px',margin:'0 auto'}}>
-          {filtered.map(company => (
-            <div key={company.id} style={{background:'#111',borderRadius:'12px',padding:'1.5rem',border:'1px solid #222'}}>
-              <h2 style={{color:'#F5A623',marginBottom:'0.5rem'}}>{company.name}</h2>
-              <p style={{color:'#aaa',fontSize:'0.9rem',marginBottom:'1rem'}}>{company.description}</p>
-              {company.phone && <span style={{color:'#ccc',fontSize:'0.85rem',display:'block'}}>📞 {company.phone}</span>}
-              {company.email && <span style={{color:'#ccc',fontSize:'0.85rem',display:'block'}}>✉️ {company.email}</span>}
-            </div>
-          ))}
-        </div>
-      )}
-
-      <div style={{textAlign:'center',marginTop:'2rem'}}>
-        <a href="/add-company" style={{background:'#F5A623',color:'black',padding:'0.75rem 1.5rem',borderRadius:'8px',textDecoration:'none',fontWeight:'bold'}}>+ أضف شركة</a>
+      <div style={{maxWidth:'1200px', margin:'0 auto', padding:'0 20px 40px'}}>
+        {!filter && !search ? (
+          <p style={{color:'rgba(255,255,255,0.7)', textAlign:'center', marginTop:'4rem', fontSize:'1.2rem'}}>
+            اختر قطاعاً أو ابحث عن شركة لعرض النتائج
+          </p>
+        ) : loading ? (
+          <p style={{color:'white', textAlign:'center'}}>جاري التحميل...</p>
+        ) : filtered.length === 0 ? (
+          <p style={{color:'rgba(255,255,255,0.7)', textAlign:'center', marginTop:'4rem'}}>لا توجد شركات في هذا القطاع</p>
+        ) : (
+          <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))', gap:'16px'}}>
+            {filtered.map(company => (
+              <div key={company.id} style={{background:'#fff', border:'1px solid #E2E8F0', borderRadius:'14px', padding:'20px 22px', transition:'all .2s', cursor:'default'}}
+                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 24px rgba(13,59,46,.15)'}
+                onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
+              >
+                <h3 style={{fontSize:'16px', fontWeight:'700', color:'#1A1F2E', marginBottom:'8px'}}>{company.name}</h3>
+                {company.category && <span style={{background:'#E8F5E9', color:'#2E7D32', padding:'4px 10px', borderRadius:'20px', fontSize:'12px', fontWeight:'600'}}>{company.category}</span>}
+                {company.description && <p style={{color:'#5A6475', fontSize:'13px', lineHeight:'1.7', marginTop:'10px'}}>{company.description}</p>}
+                <div style={{marginTop:'12px'}}>
+                  {company.phone && <p style={{color:'#5A6475', fontSize:'13px', marginBottom:'4px'}}>📞 {company.phone}</p>}
+                  {company.email && <p style={{color:'#5A6475', fontSize:'13px'}}>✉️ {company.email}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </main>
   )
@@ -85,7 +96,7 @@ function CompaniesContent() {
 
 export default function Companies() {
   return (
-    <Suspense fallback={<div style={{color:'white',textAlign:'center',padding:'2rem'}}>جاري التحميل...</div>}>
+    <Suspense fallback={<div style={{color:'white', textAlign:'center', padding:'2rem', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', minHeight:'100vh'}}>جاري التحميل...</div>}>
       <CompaniesContent />
     </Suspense>
   )
