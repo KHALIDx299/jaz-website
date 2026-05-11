@@ -41,34 +41,36 @@ function CompaniesContent() {
       <div style={{display:'flex',gap:'1rem',marginBottom:'2rem',flexWrap:'wrap',justifyContent:'center'}}>
         <input
           value={search}
-          onChange={e=>setSearch(e.target.value)}
+          onChange={e => setSearch(e.target.value)}
           placeholder="ابحث عن شركة..."
           style={{padding:'0.5rem 1rem',borderRadius:'8px',border:'1px solid #333',background:'#111',color:'white',minWidth:'200px'}}
         />
         <select
           value={filter}
-          onChange={e=>setFilter(e.target.value)}
+          onChange={e => setFilter(e.target.value)}
           style={{padding:'0.5rem 1rem',borderRadius:'8px',border:'1px solid #333',background:'#111',color:'white'}}
         >
           <option value="">-- اختر قطاع --</option>
-          {categories.map(cat=><option key={cat} value={cat}>{cat}</option>)}
+          {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
         </select>
       </div>
 
       {!filter && !search ? (
-        <p style={{textAlign:'center',color:'#aaa',marginTop:'4rem',fontSize:'1.2rem'}}>اختر قطاعاً أو ابحث عن شركة لعرض النتائج</p>
+        <p style={{textAlign:'center',color:'#aaa',marginTop:'4rem',fontSize:'1.2rem'}}>
+          اختر قطاعاً أو ابحث عن شركة لعرض النتائج
+        </p>
       ) : loading ? (
         <p style={{textAlign:'center'}}>جاري التحميل...</p>
       ) : filtered.length === 0 ? (
         <p style={{textAlign:'center',color:'#aaa'}}>لا توجد شركات في هذا القطاع</p>
       ) : (
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(300px,1fr))',gap:'1.5rem',maxWidth:'1200px',margin:'0 auto'}}>
-          {filtered.map(company=>(
+          {filtered.map(company => (
             <div key={company.id} style={{background:'#111',borderRadius:'12px',padding:'1.5rem',border:'1px solid #222'}}>
               <h2 style={{color:'#F5A623',marginBottom:'0.5rem'}}>{company.name}</h2>
               <p style={{color:'#aaa',fontSize:'0.9rem',marginBottom:'1rem'}}>{company.description}</p>
-              {company.phone&&<span style={{color:'#ccc',fontSize:'0.85rem',display:'block'}}>📞 {company.phone}</span>}
-              {company.email&&<span style={{color:'#ccc',fontSize:'0.85rem',display:'block'}}>✉️ {company.email}</span>}
+              {company.phone && <span style={{color:'#ccc',fontSize:'0.85rem',display:'block'}}>📞 {company.phone}</span>}
+              {company.email && <span style={{color:'#ccc',fontSize:'0.85rem',display:'block'}}>✉️ {company.email}</span>}
             </div>
           ))}
         </div>
