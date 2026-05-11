@@ -15,7 +15,7 @@ export default function Home() {
       <nav style={{background:'#fff',padding:'16px 5%',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid #E2E8F0',position:'sticky',top:0,zIndex:100}}>
         <div style={{fontSize:'24px',fontWeight:'800',color:'#0D3B5E'}}>J<span style={{color:'#F5A623'}}>A</span>Z <small style={{fontSize:'14px',color:'#888'}}>جاز</small></div>
         <div style={{display:'flex',gap:'12px',alignItems:'center',flexWrap:'wrap'}}>
-          <a href={`/companies?category=${cat.name}`} style={{color:'#0D3B5E',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>الشركات</a>
+          <a href="/companies" style={{color:'#0D3B5E',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>الشركات</a>
           <a href="/jobs" style={{color:'#0D3B5E',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>الوظائف</a>
           <a href="/add-company" style={{background:'#0D3B5E',color:'#fff',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'700',textDecoration:'none'}}>سجّل شركتك</a>
         </div>
@@ -69,7 +69,7 @@ export default function Home() {
         </div>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:'14px'}}>
           {[{icon:'☕',name:'الزراعة والبن',count:'٣٨٤'},{icon:'⚡',name:'الطاقة',count:'٢١٧'},{icon:'💻',name:'تقنية المعلومات',count:'١٥٦'},{icon:'🏝',name:'السياحة والجزر',count:'٢٩٤'},{icon:'⚓',name:'الملاحة',count:'١٨٣'},{icon:'🏗',name:'الإنشاء',count:'٣٤١'}].map((cat,i)=>(
-            <a key={i} href={`/companies?category=${cat.name}`} style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:'14px',padding:'24px 14px',textAlign:'center',cursor:'pointer',textDecoration:'none',display:'block'}}>
+            <a key={i} href="/companies" style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:'14px',padding:'24px 14px',textAlign:'center',cursor:'pointer',textDecoration:'none',display:'block'}}>
               <div style={{fontSize:'36px',marginBottom:'10px'}}>{cat.icon}</div>
               <div style={{fontSize:'14px',fontWeight:'700',color:'#0D3B5E'}}>{cat.name}</div>
               <div style={{fontSize:'12px',color:'#888',marginTop:'4px'}}>{cat.count} شركة</div>
@@ -93,4 +93,5 @@ export default function Home() {
     </main>
   )
 }
+
 
