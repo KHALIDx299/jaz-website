@@ -8,7 +8,8 @@ export default function Jobs() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState({
     title: '', company_name: '', salary: '',
-    job_type: '', location: '', description: '', requirements: '', email: '', phone: '', company_details: ''
+    job_type: '', location: '', description: '',
+    requirements: '', email: '', phone: '', company_details: ''
   })
   const [saving, setSaving] = useState(false)
   const [success, setSuccess] = useState(false)
@@ -23,137 +24,116 @@ export default function Jobs() {
   }
 
   async function handleSubmit() {
-    if (!form.title || !form.company_name) {
-      alert('يرجى إدخال المسمى الوظيفي واسم الشركة')
-      return
-    }
+    if (!form.title || !form.company_name) return
     setSaving(true)
-    const { error } = await supabase.from('jobs').insert([form])
-    setSaving(false)
-    if (error) { alert('حدث خطأ: ' + error.message); return }
-    setSuccess(true)
-    setShowForm(false)
+    await supabase.from('jobs').insert([form])
     setForm({ title: '', company_name: '', salary: '', job_type: '', location: '', description: '', requirements: '', email: '', phone: '', company_details: '' })
+    setSuccess(true)
     fetchJobs()
-    setTimeout(() => setSuccess(false), 3000)
+    setTimeout(() => { setSuccess(false); setShowForm(false) }, 2000)
+    setSaving(false)
   }
 
-  const typeColors = {
-    'دوام كامل': { bg: '#E8F4FD', color: '#0D3B5E' },
-    'دوام جزئي': { bg: '#FEF3E2', color: '#C8831A' },
-    'عن بُعد': { bg: '#E8F5EE', color: '#1A5C30' },
-    'عقد مؤقت': { bg: '#F3E8FD', color: '#6B21A8' },
-  }
+  const inputStyle = { width: '100%', padding: '12px 16px', border: '1px solid #E2E8F0', borderRadius: '10px', fontSize: '14px', fontFamily: 'Arial', boxSizing: 'border-box' }
+  const labelStyle = { display: 'block', fontWeight: '700', color: '#1A1F2E', marginBottom: '8px', fontSize: '14px' }
 
   return (
-    <main dir="rtl" style={{ fontFamily: 'Arial, sans-serif', background: '#F7F8FA', minHeight: '100vh' }}>
-
-      {/* HEADER */}
-      <div style={{ background: 'linear-gradient(135deg, #0D3B5E, #1A5C30)', padding: '40px 5%' }}>
-        <a href="/" style={{ color: 'rgba(255,255,255,.7)', textDecoration: 'none', fontSize: '14px' }}>← الرئيسية</a>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', flexWrap: 'wrap', gap: '12px' }}>
-          <div>
-            <h1 style={{ fontSize: 'clamp(24px,5vw,36px)', fontWeight: '800', color: '#fff' }}>بوابة وظائف جازان</h1>
-            <p style={{ color: 'rgba(255,255,255,.7)', marginTop: '6px' }}>{jobs.length} وظيفة متاحة</p>
-          </div>
-          <button onClick={() => setShowForm(!showForm)} style={{ background: '#C8831A', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: 'pointer' }}>
-            {showForm ? '✕ إغلاق' : '+ أضف وظيفة'}
-          </button>
-        </div>
+    <main dir="rtl" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)' }}>
+      <div style={{ padding: '40px 20px', textAlign: 'center', color: 'white' }}>
+        <a href="/" style={{ color: '#F5A623', fontSize: '14px', textDecoration: 'none' }}>← الرئيسية</a>
+        <h1 style={{ fontSize: '2.5rem', fontWeight: '800', margin: '16px 0 8px' }}>بوابة وظائف جازان</h1>
+        <p style={{ opacity: 0.8 }}>{jobs.length} وظيفة متاحة</p>
+        <button onClick={() => setShowForm(!showForm)} style={{ marginTop: '16px', background: '#F5A623', color: 'white', border: 'none', padding: '12px 28px', borderRadius: '10px', fontWeight: '700', cursor: 'pointer', fontSize: '15px' }}>
+          {showForm ? '✕ إغلاق' : '+ أضف وظيفة'}
+        </button>
       </div>
 
-      <div style={{ padding: '32px 5%' }}>
+      {showForm && (
+        <div style={{ maxWidth: '600px', margin: '0 auto 40px', background: 'white', borderRadius: '16px', padding: '32px' }}>
+          <h2 style={{ color: '#1A1F2E', marginBottom: '24px' }}>إضافة وظيفة جديدة</h2>
 
-        {/* رسالة النجاح */}
-        {success && (
-          <div style={{ background: '#E8F5EE', border: '1px solid #2D8C4E', borderRadius: '12px', padding: '16px 20px', marginBottom: '24px', color: '#1A5C30', fontWeight: '700' }}>
-            🎉 تم نشر الوظيفة بنجاح!
+          <div style={{ marginBottom: '16px' }}>
+            <label style={labelStyle}>المسمى الوظيفي *</label>
+            <input value={form.title} onChange={e => setForm({...form, title: e.target.value})} placeholder="مثال: مهندس برمجيات" style={inputStyle} />
           </div>
-        )}
 
-        {/* فورم إضافة وظيفة */}
-        {showForm && (
-          <div style={{ background: '#fff', borderRadius: '16px', padding: '28px', boxShadow: '0 4px 20px rgba(0,0,0,.08)', marginBottom: '32px' }}>
-            <h2 style={{ fontSize: '20px', fontWeight: '800', color: '#0D3B5E', marginBottom: '20px' }}>نشر وظيفة جديدة</h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '16px' }}>
-              {[
-                { label: 'المسمى الوظيفي *', key: 'title', placeholder: 'مثال: مهندس برمجيات' },
-                { label: 'اسم الشركة *', key: 'company_name', placeholder: 'مثال: شركة جازان للطاقة' },
-                { label: 'الراتب', key: 'salary', placeholder: 'مثال: ١٠,٠٠٠ ريال' },
-                { label: 'الموقع', key: 'location', placeholder: 'مثال: جازان الاقتصادية' },
-              ].map(f => (
-                <div key={f.key}>
-                  <label style={{ display: 'block', fontWeight: '700', color: '#1A1F2E', marginBottom: '8px', fontSize: '14px' }}>{f.label}</label>
-                  <input value={form[f.key]} onChange={e => setForm({...form, [f.key]: e.target.value})}
-                    placeholder={f.placeholder}
-                    style={{ width: '100%', padding: '12px 14px', border: '1px solid #E2E8F0', borderRadius: '10px', fontSize: '14px', direction: 'rtl', outline: 'none' }}
-                  />
-                </div>
-              ))}
-              <div>
-                <label style={{ display: 'block', fontWeight: '700', color: '#1A1F2E', marginBottom: '8px', fontSize: '14px' }}>نوع الوظيفة</label>
-                <select value={form.job_type} onChange={e => setForm({...form, job_type: e.target.value})}
-                  style={{ width: '100%', padding: '12px 14px', border: '1px solid #E2E8F0', borderRadius: '10px', fontSize: '14px', direction: 'rtl', outline: 'none', background: '#fff' }}>
-                  <option value="">اختر النوع</option>
-                  {['دوام كامل', 'دوام جزئي', 'عن بُعد', 'عقد مؤقت'].map(t => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
-            </div>
-            <div style={{ marginTop: '16px' }}>
-              <label style={{ display: 'block', fontWeight: '700', color: '#1A1F2E', marginBottom: '8px', fontSize: '14px' }}>وصف الوظيفة</label>
-              <textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})}
-                placeholder="اكتب تفاصيل الوظيفة والمتطلبات..."
-                rows={3}
-                style={{ width: '100%', padding: '12px 14px', border: '1px solid #E2E8F0', borderRadius: '10px', fontSize: '14px', direction: 'rtl', outline: 'none', resize: 'vertical' }}
-              />
-            </div>
-            <button onClick={handleSubmit} disabled={saving}
-              style={{ marginTop: '16px', background: saving ? '#999' : '#0D3B5E', color: '#fff', border: 'none', padding: '14px 32px', borderRadius: '10px', fontSize: '16px', fontWeight: '700', cursor: saving ? 'not-allowed' : 'pointer' }}>
-              {saving ? 'جاري النشر...' : '📢 انشر الوظيفة'}
-            </button>
+          <div style={{ marginBottom: '16px' }}>
+            <label style={labelStyle}>اسم الشركة *</label>
+            <input value={form.company_name} onChange={e => setForm({...form, company_name: e.target.value})} placeholder="اسم الشركة" style={inputStyle} />
           </div>
-        )}
 
-        {/* قائمة الوظائف */}
+          <div style={{ marginBottom: '16px' }}>
+            <label style={labelStyle}>الراتب</label>
+            <input value={form.salary} onChange={e => setForm({...form, salary: e.target.value})} placeholder="مثال: 5000 ريال" style={inputStyle} />
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={labelStyle}>نوع الدوام</label>
+            <select value={form.job_type} onChange={e => setForm({...form, job_type: e.target.value})} style={inputStyle}>
+              <option value="">اختر نوع الدوام</option>
+              {['دوام كامل', 'دوام جزئي', 'عن بُعد', 'عقد مؤقت'].map(t => <option key={t} value={t}>{t}</option>)}
+            </select>
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={labelStyle}>الموقع</label>
+            <input value={form.location} onChange={e => setForm({...form, location: e.target.value})} placeholder="مثال: جازان" style={inputStyle} />
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={labelStyle}>وصف الوظيفة</label>
+            <textarea value={form.description} onChange={e => setForm({...form, description: e.target.value})} placeholder="اكتب وصفاً للوظيفة..." rows={3} style={inputStyle} />
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={labelStyle}>الشروط والمتطلبات</label>
+            <textarea value={form.requirements} onChange={e => setForm({...form, requirements: e.target.value})} placeholder="اكتب الشروط والمتطلبات..." rows={3} style={inputStyle} />
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={labelStyle}>تفاصيل عن الشركة</label>
+            <textarea value={form.company_details} onChange={e => setForm({...form, company_details: e.target.value})} placeholder="اكتب تفاصيل عن الشركة..." rows={3} style={inputStyle} />
+          </div>
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={labelStyle}>رقم التواصل</label>
+            <input value={form.phone} onChange={e => setForm({...form, phone: e.target.value})} placeholder="05xxxxxxxx" style={inputStyle} />
+          </div>
+
+          <div style={{ marginBottom: '24px' }}>
+            <label style={labelStyle}>إيميل التواصل</label>
+            <input value={form.email} onChange={e => setForm({...form, email: e.target.value})} placeholder="example@email.com" style={inputStyle} />
+          </div>
+
+          {success && <div style={{ background: '#d4edda', color: '#155724', padding: '12px', borderRadius: '8px', marginBottom: '16px', textAlign: 'center' }}>✅ تمت إضافة الوظيفة بنجاح!</div>}
+
+          <button onClick={handleSubmit} disabled={saving} style={{ width: '100%', background: '#0D3B2E', color: 'white', border: 'none', padding: '14px', borderRadius: '10px', fontWeight: '700', cursor: 'pointer', fontSize: '16px' }}>
+            {saving ? 'جاري الحفظ...' : 'نشر الوظيفة'}
+          </button>
+        </div>
+      )}
+
+      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px 40px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px', color: '#5A6475' }}>جاري التحميل...</div>
-        ) : jobs.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px' }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>💼</div>
-            <div style={{ fontSize: '18px', fontWeight: '700', color: '#1A1F2E' }}>لا توجد وظائف بعد</div>
-            <button onClick={() => setShowForm(true)} style={{ marginTop: '16px', background: '#0D3B5E', color: '#fff', border: 'none', padding: '12px 24px', borderRadius: '10px', fontSize: '15px', fontWeight: '700', cursor: 'pointer' }}>
-              + أضف أول وظيفة
-            </button>
-          </div>
+          <p style={{ color: 'white', textAlign: 'center' }}>جاري التحميل...</p>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '16px' }}>
-            {jobs.map(job => (
-              <div key={job.id} style={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: '14px', padding: '20px 22px', transition: 'all .2s', cursor: 'pointer' }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 24px rgba(13,59,94,.1)'}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'} onClick={() => window.location.href = `/jobs/${job.id}`}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
-                  <div style={{ fontWeight: '700', fontSize: '16px', color: '#1A1F2E' }}>{job.title}</div>
-                  {job.job_type && (
-                    <span style={{ background: typeColors[job.job_type]?.bg || '#F7F8FA', color: typeColors[job.job_type]?.color || '#5A6475', fontSize: '12px', fontWeight: '700', padding: '4px 10px', borderRadius: '20px', whiteSpace: 'nowrap' }}>
-                      {job.job_type}
-                    </span>
-                  )}
-                </div>
-                <div style={{ fontSize: '14px', color: '#5A6475', marginBottom: '10px' }}>
-                  🏢 {job.company_name} {job.location ? `· 📍 ${job.location}` : ''}
-                </div>
-                {job.salary && (
-                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#C8831A', marginBottom: '10px' }}>💰 {job.salary}</div>
-                )}
-                {job.description && (
-                  <div style={{ fontSize: '13px', color: '#5A6475', lineHeight: '1.7' }}>{job.description}</div>
-                )}
+          jobs.map(job => (
+            <div key={job.id} style={{ background: '#fff', border: '1px solid #E2E8F0', borderRadius: '14px', padding: '20px 22px', transition: 'all .2s', cursor: 'pointer' }}
+              onMouseEnter={e => e.currentTarget.style.boxShadow = '0 8px 24px rgba(13,59,46,.1)'}
+              onMouseLeave={e => e.currentTarget.style.boxShadow = 'none'}
+              onClick={() => window.location.href = `/jobs/${job.id}`}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#1A1F2E' }}>{job.title}</h3>
+                {job.job_type && <span style={{ background: '#E8F5E9', color: '#2E7D32', padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '600', whiteSpace: 'nowrap' }}>{job.job_type}</span>}
               </div>
-            ))}
-          </div>
+              <p style={{ color: '#5A6475', fontSize: '14px', marginBottom: '8px' }}>🏢 {job.company_name} · 📍 {job.location || 'جازان'}</p>
+              {job.salary && <div style={{ fontSize: '14px', fontWeight: '700', color: '#C8831A', marginBottom: '10px' }}>💰 {job.salary}</div>}
+              {job.description && <div style={{ fontSize: '13px', color: '#5A6475', lineHeight: '1.7' }}>{job.description}</div>}
+            </div>
+          ))
         )}
       </div>
     </main>
   )
 }
-
