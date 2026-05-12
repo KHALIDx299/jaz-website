@@ -182,9 +182,49 @@ export default function Home() {
         </div>
       </section>
 
-      <footer style={{background:'#081522',color:'rgba(255,255,255,.4)',textAlign:'center',padding:'24px',fontSize:'14px'}}>
-        <span style={{color:'#F5A623',fontWeight:'700'}}>JAZ جاز</span> © ٢٠٢٥ — جميع الحقوق محفوظة
-      </footer>
+     <footer style={{background:'#081522',color:'rgba(255,255,255,.4)',padding:'40px 5% 24px',fontSize:'14px'}}>
+  <div style={{maxWidth:'1200px',margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:'30px',marginBottom:'24px'}}>
+
+    {/* قسم: عن الموقع */}
+    <div>
+      <div style={{fontSize:'22px',fontWeight:'800',color:'#fff',marginBottom:'10px'}}>
+        J<span style={{color:'#F5A623'}}>A</span>Z <span style={{fontSize:'14px',color:'#F5A623',fontWeight:'700'}}>جاز</span>
+      </div>
+      <p style={{color:'rgba(255,255,255,.5)',fontSize:'13px',lineHeight:'1.7',margin:0}}>
+        دليل الأعمال والوظائف في منطقة جازان
+      </p>
+    </div>
+
+    {/* قسم: التواصل */}
+    <div>
+      <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>
+        تواصل معنا
+      </div>
+      <a href="mailto:jaz.ceeo99@gmail.com" style={{display:'flex',alignItems:'center',gap:'8px',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'10px'}}>
+        📧 jaz.ceeo99@gmail.com
+      </a>
+      <a href="tel:0536187768" style={{display:'flex',alignItems:'center',gap:'8px',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',direction:'ltr',justifyContent:'flex-end'}}>
+        <span style={{direction:'rtl'}}>📱 0536187768</span>
+      </a>
+    </div>
+
+    {/* قسم: روابط سريعة */}
+    <div>
+      <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>
+        روابط سريعة
+      </div>
+      <a href="/companies" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الشركات</a>
+      <a href="/jobs" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الوظائف</a>
+      <a href="/add-company" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>سجّل شركتك</a>
+    </div>
+
+  </div>
+
+  {/* خط فاصل + حقوق الملكية */}
+  <div style={{borderTop:'1px solid rgba(255,255,255,.1)',paddingTop:'20px',textAlign:'center'}}>
+    <span style={{color:'#F5A623',fontWeight:'700'}}>JAZ جاز</span> © ٢٠٢٥ — جميع الحقوق محفوظة
+  </div>
+</footer>
     </main>
   )
 }
