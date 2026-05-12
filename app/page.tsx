@@ -1,14 +1,96 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { supabase } from '../lib/supabase'
 
 export default function Home() {
   const [searchType, setSearchType] = useState('companies')
+  const [user, setUser] = useState<any>(null)
+  const [role, setRole] = useState<string | null>(null)
+  const [loadingUser, setLoadingUser] = useState(true)
+
+  // 🆕 حالات للإحصائيات الحقيقية
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
+  const [totalCompanies, setTotalCompanies] = useState(0)
+  const [totalJobs, setTotalJobs] = useState(0)
+
+  useEffect(() => {
+    checkUser()
+    fetchStats()
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        setUser(session.user)
+        fetchRole(session.user.id)
+      } else {
+        setUser(null)
+        setRole(null)
+      }
+    })
+    return () => { listener?.subscription.unsubscribe() }
+  }, [])
+
+  async function checkUser() {
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      setUser(user)
+      await fetchRole(user.id)
+    }
+    setLoadingUser(false)
+  }
+
+  async function fetchRole(userId: string) {
+    const { data } = await supabase.from('profiles').select('role').eq('id', userId).single()
+    if (data) setRole(data.role)
+  }
+
+  // 🆕 جلب الإحصائيات من القاعدة
+  async function fetchStats() {
+    // جلب كل الشركات المعتمدة
+    const { data: companies } = await supabase
+      .from('companies')
+      .select('category')
+      .eq('status', 'approved')
+
+    if (companies) {
+      setTotalCompanies(companies.length)
+      // عدّ الشركات في كل قطاع
+      const counts: Record<string, number> = {}
+      companies.forEach(c => {
+        if (c.category) {
+          counts[c.category] = (counts[c.category] || 0) + 1
+        }
+      })
+      setCategoryCounts(counts)
+    }
+
+    // جلب عدد الوظائف
+    const { count: jobsCount } = await supabase
+      .from('jobs')
+      .select('*', { count: 'exact', head: true })
+    setTotalJobs(jobsCount || 0)
+  }
+
+  async function handleLogout() {
+    await supabase.auth.signOut()
+    setUser(null)
+    setRole(null)
+    window.location.href = '/'
+  }
 
   function handleSearch() {
     const val = (document.getElementById('searchInput') as HTMLInputElement)?.value
     if(val) window.location.href = `/${searchType}?q=${val}`
     else window.location.href = `/${searchType}`
   }
+
+  // 🆕 القطاعات مع الأرقام الحقيقية من القاعدة
+  const categoryList = [
+    { icon: '☕', name: 'الزراعة والبن' },
+    { icon: '⚡', name: 'الطاقة' },
+    { icon: '💻', name: 'تقنية المعلومات' },
+    { icon: '🏝', name: 'السياحة والجزر' },
+    { icon: '⚓', name: 'الملاحة' },
+    { icon: '🏗', name: 'الإنشاء' }
+  ]
 
   return (
     <main dir="rtl" style={{fontFamily:'Arial,sans-serif',background:'#F7F8FA',minHeight:'100vh'}}>
@@ -17,7 +99,25 @@ export default function Home() {
         <div style={{display:'flex',gap:'12px',alignItems:'center',flexWrap:'wrap'}}>
           <a href="/companies" style={{color:'#0D3B5E',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>الشركات</a>
           <a href="/jobs" style={{color:'#0D3B5E',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>الوظائف</a>
-          <a href="/add-company" style={{background:'#0D3B5E',color:'#fff',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'700',textDecoration:'none'}}>سجّل شركتك</a>
+
+          {loadingUser ? (
+            <div style={{width:'180px',height:'40px'}}></div>
+          ) : !user ? (
+            <>
+              <a href="/login" style={{color:'#0D3B5E',textDecoration:'none',fontSize:'14px',fontWeight:'600',padding:'10px 16px'}}>تسجيل دخول</a>
+              <a href="/add-company" style={{background:'#0D3B5E',color:'#fff',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'700',textDecoration:'none'}}>سجّل شركتك</a>
+            </>
+          ) : role === 'admin' ? (
+            <>
+              <a href="/admin" style={{background:'#C8831A',color:'#fff',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'700',textDecoration:'none'}}>لوحة الأدمن 👑</a>
+              <button onClick={handleLogout} style={{background:'transparent',border:'1px solid #E2E8F0',color:'#5A6475',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'600',cursor:'pointer',fontFamily:'Arial,sans-serif'}}>خروج</button>
+            </>
+          ) : (
+            <>
+              <a href="/dashboard" style={{background:'#0D3B5E',color:'#fff',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'700',textDecoration:'none'}}>حسابي</a>
+              <button onClick={handleLogout} style={{background:'transparent',border:'1px solid #E2E8F0',color:'#5A6475',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'600',cursor:'pointer',fontFamily:'Arial,sans-serif'}}>خروج</button>
+            </>
+          )}
         </div>
       </nav>
 
@@ -26,34 +126,25 @@ export default function Home() {
         <h1 style={{fontSize:'clamp(28px,5vw,52px)',fontWeight:'800',color:'#fff',marginBottom:'16px',lineHeight:'1.2'}}>JAZ: تواصل مع <span style={{color:'#F5A623'}}>مستقبل جازان</span></h1>
         <p style={{color:'rgba(255,255,255,.7)',fontSize:'18px',marginBottom:'36px'}}>منصتك الذكية للعثور على الشركات والوظائف والفرص في جازان</p>
 
-        {/* خانة تحديد نوع البحث */}
         <div style={{display:'flex',justifyContent:'center',gap:'0',marginBottom:'16px',maxWidth:'520px',margin:'0 auto 16px'}}>
-          <button onClick={()=>setSearchType('companies')}
-            style={{flex:1,padding:'11px',border:'none',borderRadius:'10px 0 0 10px',
-              background:searchType==='companies'?'#C8831A':'rgba(255,255,255,.15)',
-              color:'#fff',fontFamily:'Arial,sans-serif',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>
-            🏢 شركة
-          </button>
-          <button onClick={()=>setSearchType('jobs')}
-            style={{flex:1,padding:'11px',border:'none',borderRadius:'0 10px 10px 0',
-              background:searchType==='jobs'?'#C8831A':'rgba(255,255,255,.15)',
-              color:'#fff',fontFamily:'Arial,sans-serif',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>
-            💼 وظيفة
-          </button>
+          <button onClick={()=>setSearchType('companies')} style={{flex:1,padding:'11px',border:'none',borderRadius:'10px 0 0 10px',background:searchType==='companies'?'#C8831A':'rgba(255,255,255,.15)',color:'#fff',fontFamily:'Arial,sans-serif',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>🏢 شركة</button>
+          <button onClick={()=>setSearchType('jobs')} style={{flex:1,padding:'11px',border:'none',borderRadius:'0 10px 10px 0',background:searchType==='jobs'?'#C8831A':'rgba(255,255,255,.15)',color:'#fff',fontFamily:'Arial,sans-serif',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>💼 وظيفة</button>
         </div>
 
         <div style={{display:'flex',maxWidth:'520px',margin:'0 auto',background:'#fff',borderRadius:'12px',overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,.3)'}}>
-          <input id="searchInput" type="text"
-            placeholder={searchType==='companies'?'ابحث عن شركة...':'ابحث عن وظيفة...'}
-            style={{flex:1,padding:'16px 18px',border:'none',outline:'none',fontSize:'16px',direction:'rtl'}}
-            onKeyDown={(e)=>{ if(e.key==='Enter') handleSearch() }}
-          />
+          <input id="searchInput" type="text" placeholder={searchType==='companies'?'ابحث عن شركة...':'ابحث عن وظيفة...'} style={{flex:1,padding:'16px 18px',border:'none',outline:'none',fontSize:'16px',direction:'rtl'}} onKeyDown={(e)=>{ if(e.key==='Enter') handleSearch() }} />
           <button onClick={handleSearch} style={{background:'#C8831A',color:'#fff',border:'none',padding:'14px 22px',fontSize:'15px',fontWeight:'700',cursor:'pointer'}}>🔍 بحث</button>
         </div>
       </div>
 
+      {/* 🆕 إحصائيات حقيقية من القاعدة */}
       <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',background:'#fff',borderBottom:'1px solid #E2E8F0'}}>
-        {[{num:'+٢٤٠٠',label:'شركة مسجّلة'},{num:'١٨',label:'قطاعاً اقتصادياً'},{num:'+٨٧٠',label:'وظيفة متاحة'},{num:'٩٨٪',label:'رضا المستخدمين'}].map((s,i)=>(
+        {[
+          {num:`+${totalCompanies}`,label:'شركة مسجّلة'},
+          {num:`${Object.keys(categoryCounts).length}`,label:'قطاعاً اقتصادياً'},
+          {num:`+${totalJobs}`,label:'وظيفة متاحة'},
+          {num:'٩٨٪',label:'رضا المستخدمين'}
+        ].map((s,i)=>(
           <div key={i} style={{padding:'24px 16px',textAlign:'center',borderLeft:i<3?'1px solid #E2E8F0':'none'}}>
             <div style={{fontSize:'clamp(22px,4vw,32px)',fontWeight:'800',color:'#0D3B5E'}}>{s.num}</div>
             <div style={{fontSize:'13px',color:'#5A6475',marginTop:'4px'}}>{s.label}</div>
@@ -68,11 +159,15 @@ export default function Home() {
           <div style={{fontSize:'clamp(22px,4vw,32px)',fontWeight:'800',color:'#0D3B5E'}}>اكتشف قطاعات جازان</div>
         </div>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:'14px'}}>
-          {[{icon:'☕',name:'الزراعة والبن',count:'٣٨٤'},{icon:'⚡',name:'الطاقة',count:'٢١٧'},{icon:'💻',name:'تقنية المعلومات',count:'١٥٦'},{icon:'🏝',name:'السياحة والجزر',count:'٢٩٤'},{icon:'⚓',name:'الملاحة',count:'١٨٣'},{icon:'🏗',name:'الإنشاء',count:'٣٤١'}].map((cat,i)=>(
-            <a key={i} href="/companies" style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:'14px',padding:'24px 14px',textAlign:'center',cursor:'pointer',textDecoration:'none',display:'block'}}>
+          {/* 🆕 كل قطاع يودي لصفحة الشركات بفلتر جاهز */}
+          {categoryList.map((cat,i)=>(
+            <a key={i} href={`/companies?category=${encodeURIComponent(cat.name)}`} style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:'14px',padding:'24px 14px',textAlign:'center',cursor:'pointer',textDecoration:'none',display:'block',transition:'all .2s'}}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = '#C8831A'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(200,131,26,0.15)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
+            >
               <div style={{fontSize:'36px',marginBottom:'10px'}}>{cat.icon}</div>
               <div style={{fontSize:'14px',fontWeight:'700',color:'#0D3B5E'}}>{cat.name}</div>
-              <div style={{fontSize:'12px',color:'#888',marginTop:'4px'}}>{cat.count} شركة</div>
+              <div style={{fontSize:'12px',color:'#888',marginTop:'4px'}}>{categoryCounts[cat.name] || 0} شركة</div>
             </a>
           ))}
         </div>
@@ -93,5 +188,3 @@ export default function Home() {
     </main>
   )
 }
-
-
