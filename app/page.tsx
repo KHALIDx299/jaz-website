@@ -7,8 +7,6 @@ export default function Home() {
   const [user, setUser] = useState<any>(null)
   const [role, setRole] = useState<string | null>(null)
   const [loadingUser, setLoadingUser] = useState(true)
-
-  // 🆕 حالات للإحصائيات الحقيقية
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
   const [totalCompanies, setTotalCompanies] = useState(0)
   const [totalJobs, setTotalJobs] = useState(0)
@@ -42,9 +40,7 @@ export default function Home() {
     if (data) setRole(data.role)
   }
 
-  // 🆕 جلب الإحصائيات من القاعدة
   async function fetchStats() {
-    // جلب كل الشركات المعتمدة
     const { data: companies } = await supabase
       .from('companies')
       .select('category')
@@ -52,7 +48,6 @@ export default function Home() {
 
     if (companies) {
       setTotalCompanies(companies.length)
-      // عدّ الشركات في كل قطاع
       const counts: Record<string, number> = {}
       companies.forEach(c => {
         if (c.category) {
@@ -62,7 +57,6 @@ export default function Home() {
       setCategoryCounts(counts)
     }
 
-    // جلب عدد الوظائف
     const { count: jobsCount } = await supabase
       .from('jobs')
       .select('*', { count: 'exact', head: true })
@@ -82,7 +76,6 @@ export default function Home() {
     else window.location.href = `/${searchType}`
   }
 
-  // 🆕 القطاعات مع الأرقام الحقيقية من القاعدة
   const categoryList = [
     { icon: '☕', name: 'الزراعة والبن' },
     { icon: '⚡', name: 'الطاقة' },
@@ -94,8 +87,13 @@ export default function Home() {
 
   return (
     <main dir="rtl" style={{fontFamily:'Arial,sans-serif',background:'#F7F8FA',minHeight:'100vh'}}>
-      <nav style={{background:'#fff',padding:'16px 5%',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid #E2E8F0',position:'sticky',top:0,zIndex:100}}>
-        <div style={{fontSize:'24px',fontWeight:'800',color:'#0D3B5E'}}>J<span style={{color:'#F5A623'}}>A</span>Z <small style={{fontSize:'14px',color:'#888'}}>جاز</small></div>
+      <nav style={{background:'#fff',padding:'12px 5%',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid #E2E8F0',position:'sticky',top:0,zIndex:100}}>
+
+        {/* 🆕 شعار الصورة */}
+        <a href="/" style={{display:'inline-flex',alignItems:'center',textDecoration:'none'}}>
+          <img src="/logo.png" alt="JAZ - دليل جازان" style={{height:'55px',width:'auto'}} />
+        </a>
+
         <div style={{display:'flex',gap:'12px',alignItems:'center',flexWrap:'wrap'}}>
           <a href="/companies" style={{color:'#0D3B5E',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>الشركات</a>
           <a href="/jobs" style={{color:'#0D3B5E',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>الوظائف</a>
@@ -137,7 +135,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 🆕 إحصائيات حقيقية من القاعدة */}
       <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',background:'#fff',borderBottom:'1px solid #E2E8F0'}}>
         {[
           {num:`+${totalCompanies}`,label:'شركة مسجّلة'},
@@ -159,7 +156,6 @@ export default function Home() {
           <div style={{fontSize:'clamp(22px,4vw,32px)',fontWeight:'800',color:'#0D3B5E'}}>اكتشف قطاعات جازان</div>
         </div>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:'14px'}}>
-          {/* 🆕 كل قطاع يودي لصفحة الشركات بفلتر جاهز */}
           {categoryList.map((cat,i)=>(
             <a key={i} href={`/companies?category=${encodeURIComponent(cat.name)}`} style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:'14px',padding:'24px 14px',textAlign:'center',cursor:'pointer',textDecoration:'none',display:'block',transition:'all .2s'}}
               onMouseEnter={e => { e.currentTarget.style.borderColor = '#C8831A'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(200,131,26,0.15)' }}
@@ -182,49 +178,43 @@ export default function Home() {
         </div>
       </section>
 
-     <footer style={{background:'#081522',color:'rgba(255,255,255,.4)',padding:'40px 5% 24px',fontSize:'14px'}}>
-  <div style={{maxWidth:'1200px',margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:'30px',marginBottom:'24px'}}>
+      <footer style={{background:'#081522',color:'rgba(255,255,255,.4)',padding:'40px 5% 24px',fontSize:'14px'}}>
+        <div style={{maxWidth:'1200px',margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:'30px',marginBottom:'24px'}}>
 
-    {/* قسم: عن الموقع */}
-    <div>
-      <div style={{fontSize:'22px',fontWeight:'800',color:'#fff',marginBottom:'10px'}}>
-        J<span style={{color:'#F5A623'}}>A</span>Z <span style={{fontSize:'14px',color:'#F5A623',fontWeight:'700'}}>جاز</span>
-      </div>
-      <p style={{color:'rgba(255,255,255,.5)',fontSize:'13px',lineHeight:'1.7',margin:0}}>
-        دليل الأعمال والوظائف في منطقة جازان
-      </p>
-    </div>
+          <div>
+            <img src="/logo.png" alt="JAZ" style={{height:'60px',width:'auto',marginBottom:'12px'}} />
+            <p style={{color:'rgba(255,255,255,.5)',fontSize:'13px',lineHeight:'1.7',margin:0}}>
+              دليل الأعمال والوظائف في منطقة جازان
+            </p>
+          </div>
 
-    {/* قسم: التواصل */}
-    <div>
-      <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>
-        تواصل معنا
-      </div>
-      <a href="mailto:jaz.ceeo99@gmail.com" style={{display:'flex',alignItems:'center',gap:'8px',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'10px'}}>
-        📧 jaz.ceeo99@gmail.com
-      </a>
-      <a href="tel:0536187768" style={{display:'flex',alignItems:'center',gap:'8px',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',direction:'ltr',justifyContent:'flex-end'}}>
-        <span style={{direction:'rtl'}}>📱 0536187768</span>
-      </a>
-    </div>
+          <div>
+            <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>
+              تواصل معنا
+            </div>
+            <a href="mailto:jaz.ceeo99@gmail.com" style={{display:'flex',alignItems:'center',gap:'8px',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'10px'}}>
+              📧 jaz.ceeo99@gmail.com
+            </a>
+            <a href="tel:0536187768" style={{display:'flex',alignItems:'center',gap:'8px',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>
+              📱 0536187768
+            </a>
+          </div>
 
-    {/* قسم: روابط سريعة */}
-    <div>
-      <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>
-        روابط سريعة
-      </div>
-      <a href="/companies" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الشركات</a>
-      <a href="/jobs" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الوظائف</a>
-      <a href="/add-company" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>سجّل شركتك</a>
-    </div>
+          <div>
+            <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>
+              روابط سريعة
+            </div>
+            <a href="/companies" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الشركات</a>
+            <a href="/jobs" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الوظائف</a>
+            <a href="/add-company" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>سجّل شركتك</a>
+          </div>
 
-  </div>
+        </div>
 
-  {/* خط فاصل + حقوق الملكية */}
-  <div style={{borderTop:'1px solid rgba(255,255,255,.1)',paddingTop:'20px',textAlign:'center'}}>
-    <span style={{color:'#F5A623',fontWeight:'700'}}>JAZ جاز</span> © ٢٠٢٥ — جميع الحقوق محفوظة
-  </div>
-</footer>
+        <div style={{borderTop:'1px solid rgba(255,255,255,.1)',paddingTop:'20px',textAlign:'center'}}>
+          <span style={{color:'#F5A623',fontWeight:'700'}}>JAZ جاز</span> © ٢٠٢٥ — جميع الحقوق محفوظة
+        </div>
+      </footer>
     </main>
   )
 }

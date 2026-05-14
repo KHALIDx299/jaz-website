@@ -10,62 +10,42 @@ export default function JobDetail() {
 
   useEffect(() => {
     async function fetchJob() {
-      const { data } = await supabase
-        .from('jobs')
-        .select('*')
-        .eq('id', params.id)
-        .single()
+      const { data } = await supabase.from('jobs').select('*').eq('id', params.id).single()
       setJob(data)
       setLoading(false)
     }
     if (params.id) fetchJob()
   }, [params.id])
 
-  if (loading) {
-    return (
-      <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontSize:'18px', fontFamily:'Arial,sans-serif'}}>
-        جاري التحميل...
-      </main>
-    )
-  }
+  if (loading) return (
+    <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontFamily:'Arial,sans-serif'}}>جاري التحميل...</main>
+  )
 
-  if (!job) {
-    return (
-      <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', color:'white', fontFamily:'Arial,sans-serif'}}>
-        <h1 style={{fontSize:'2rem', marginBottom:'1rem'}}>الوظيفة غير موجودة 😔</h1>
-        <a href="/jobs" style={{color:'#F5A623', textDecoration:'none', fontSize:'16px'}}>← رجوع لقائمة الوظائف</a>
-      </main>
-    )
-  }
+  if (!job) return (
+    <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', color:'white', fontFamily:'Arial,sans-serif'}}>
+      <h1>الوظيفة غير موجودة 😔</h1>
+      <a href="/jobs" style={{color:'#F5A623', textDecoration:'none', marginTop:'1rem'}}>← رجوع لقائمة الوظائف</a>
+    </main>
+  )
 
   return (
     <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', padding:'40px 20px', fontFamily:'Arial,sans-serif'}}>
       <div style={{maxWidth:'900px', margin:'0 auto'}}>
-
-        <a href="/jobs" style={{color:'#F5A623', fontSize:'14px', textDecoration:'none', display:'inline-block', marginBottom:'24px'}}>
-          ← رجوع لقائمة الوظائف
-        </a>
+        <a href="/jobs" style={{color:'#F5A623', fontSize:'14px', textDecoration:'none', display:'inline-block', marginBottom:'24px'}}>← رجوع لقائمة الوظائف</a>
 
         <div style={{background:'#fff', borderRadius:'16px', padding:'32px', marginBottom:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
-          {job.job_type && (
-            <span style={{background:'#E8F5E9', color:'#2E7D32', padding:'6px 14px', borderRadius:'20px', fontSize:'13px', fontWeight:'600', display:'inline-block', marginBottom:'12px'}}>
-              {job.job_type}
-            </span>
-          )}
-          <h1 style={{fontSize:'2rem', fontWeight:'800', color:'#1A1F2E', marginBottom:'12px', lineHeight:'1.3'}}>
-            {job.title}
-          </h1>
-          {job.company_name && (
-            <p style={{color:'#5A6475', fontSize:'15px', marginBottom:'6px'}}>
-              🏢 {job.company_name}
-            </p>
-          )}
-          {job.location && (
-            <p style={{color:'#5A6475', fontSize:'15px'}}>
-              📍 {job.location}
-            </p>
-          )}
+          {job.job_type && <span style={{background:'#E8F5E9', color:'#2E7D32', padding:'6px 14px', borderRadius:'20px', fontSize:'13px', fontWeight:'600', display:'inline-block', marginBottom:'12px'}}>{job.job_type}</span>}
+          <h1 style={{fontSize:'2rem', fontWeight:'800', color:'#1A1F2E', marginBottom:'12px', lineHeight:'1.3'}}>{job.title}</h1>
+          {job.company_name && <p style={{color:'#5A6475', fontSize:'15px', marginBottom:'6px'}}>🏢 {job.company_name}</p>}
+          {job.location && <p style={{color:'#5A6475', fontSize:'15px'}}>📍 {job.location}</p>}
         </div>
+
+        {job.apply_url && (
+          <a href={job.apply_url} target="_blank" rel="noopener noreferrer" style={{display:'block', background:'linear-gradient(135deg, #F5A623, #C8831A)', color:'#fff', padding:'20px', borderRadius:'16px', textDecoration:'none', marginBottom:'20px', textAlign:'center', boxShadow:'0 6px 20px rgba(245,166,35,0.4)'}}>
+            <div style={{fontSize:'1.2rem', fontWeight:'800', marginBottom:'4px'}}>🚀 قدّم الآن على المنصة</div>
+            <div style={{fontSize:'13px', opacity:0.9}}>اضغط للانتقال لرابط التقديم في مصدر الوظيفة</div>
+          </a>
+        )}
 
         <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:'14px', marginBottom:'20px'}}>
           {job.salary && (
@@ -84,42 +64,28 @@ export default function JobDetail() {
 
         {job.description && (
           <div style={{background:'#fff', borderRadius:'16px', padding:'28px', marginBottom:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
-            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'16px', display:'flex', alignItems:'center', gap:'8px'}}>
-              📝 وصف الوظيفة
-            </h2>
-            <p style={{color:'#5A6475', fontSize:'15px', lineHeight:'1.9', whiteSpace:'pre-line'}}>
-              {job.description}
-            </p>
+            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'16px'}}>📝 وصف الوظيفة</h2>
+            <p style={{color:'#5A6475', fontSize:'15px', lineHeight:'1.9', whiteSpace:'pre-line'}}>{job.description}</p>
           </div>
         )}
 
         {job.requirements && (
           <div style={{background:'#fff', borderRadius:'16px', padding:'28px', marginBottom:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
-            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'16px', display:'flex', alignItems:'center', gap:'8px'}}>
-              ✅ الشروط والمتطلبات
-            </h2>
-            <p style={{color:'#5A6475', fontSize:'15px', lineHeight:'1.9', whiteSpace:'pre-line'}}>
-              {job.requirements}
-            </p>
+            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'16px'}}>✅ الشروط والمتطلبات</h2>
+            <p style={{color:'#5A6475', fontSize:'15px', lineHeight:'1.9', whiteSpace:'pre-line'}}>{job.requirements}</p>
           </div>
         )}
 
         {job.company_details && (
           <div style={{background:'#fff', borderRadius:'16px', padding:'28px', marginBottom:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
-            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'16px', display:'flex', alignItems:'center', gap:'8px'}}>
-              🏢 عن الشركة
-            </h2>
-            <p style={{color:'#5A6475', fontSize:'15px', lineHeight:'1.9', whiteSpace:'pre-line'}}>
-              {job.company_details}
-            </p>
+            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'16px'}}>🏢 عن الشركة</h2>
+            <p style={{color:'#5A6475', fontSize:'15px', lineHeight:'1.9', whiteSpace:'pre-line'}}>{job.company_details}</p>
           </div>
         )}
 
         {(job.phone || job.email) && (
           <div style={{background:'#fff', borderRadius:'16px', padding:'28px', marginBottom:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
-            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'20px', display:'flex', alignItems:'center', gap:'8px'}}>
-              📞 للتقديم والتواصل
-            </h2>
+            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'20px'}}>📞 للتقديم والتواصل</h2>
             <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:'14px'}}>
               {job.phone && (
                 <a href={`tel:${job.phone}`} style={{background:'#F7F8FA', padding:'16px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block'}}>
