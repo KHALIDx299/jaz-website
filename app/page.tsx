@@ -10,6 +10,7 @@ export default function Home() {
   const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
   const [totalCompanies, setTotalCompanies] = useState(0)
   const [totalJobs, setTotalJobs] = useState(0)
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     checkUser()
@@ -85,11 +86,31 @@ export default function Home() {
     { icon: '🏗', name: 'الإنشاء' }
   ]
 
+  const navLinkStyle = {
+    color:'#0D3B5E',
+    textDecoration:'none',
+    fontSize:'14px',
+    fontWeight:'600' as const,
+    padding:'10px 14px',
+    display:'block'
+  }
+
   return (
     <main dir="rtl" style={{fontFamily:'Arial,sans-serif',background:'#F7F8FA',minHeight:'100vh'}}>
+      <style>{`
+        .desktop-nav { display: flex; gap: 12px; align-items: center; }
+        .mobile-menu-btn { display: none; }
+        .mobile-menu { display: none; }
+        @media (max-width: 768px) {
+          .desktop-nav { display: none !important; }
+          .mobile-menu-btn { display: flex !important; }
+          .mobile-menu.open { display: block !important; }
+        }
+      `}</style>
+
       <nav style={{background:'#fff',padding:'16px 5%',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid #E2E8F0',position:'sticky',top:0,zIndex:100}}>
 
-        {/* الشعار النصي */}
+        {/* الشعار */}
         <a href="/" style={{display:'inline-flex',alignItems:'center',background:'#0D3B5E',padding:'8px 18px',borderRadius:'10px',gap:'8px',textDecoration:'none'}}>
           <span style={{fontSize:'24px',fontWeight:'800',color:'#fff'}}>J</span>
           <span style={{width:'1px',height:'24px',background:'#F5A623'}}></span>
@@ -99,15 +120,16 @@ export default function Home() {
           <span style={{fontSize:'14px',color:'#F5A623',fontWeight:'700',marginRight:'4px'}}>جاز</span>
         </a>
 
-        <div style={{display:'flex',gap:'12px',alignItems:'center',flexWrap:'wrap'}}>
-          <a href="/companies" style={{color:'#0D3B5E',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>الشركات</a>
-          <a href="/jobs" style={{color:'#0D3B5E',textDecoration:'none',fontSize:'14px',fontWeight:'600'}}>الوظائف</a>
+        {/* قائمة الكمبيوتر */}
+        <div className="desktop-nav">
+          <a href="/companies" style={navLinkStyle}>الشركات</a>
+          <a href="/jobs" style={navLinkStyle}>الوظائف</a>
 
           {loadingUser ? (
             <div style={{width:'180px',height:'40px'}}></div>
           ) : !user ? (
             <>
-              <a href="/login" style={{color:'#0D3B5E',textDecoration:'none',fontSize:'14px',fontWeight:'600',padding:'10px 16px'}}>تسجيل دخول</a>
+              <a href="/login" style={navLinkStyle}>تسجيل دخول</a>
               <a href="/add-company" style={{background:'#0D3B5E',color:'#fff',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'700',textDecoration:'none'}}>سجّل شركتك</a>
             </>
           ) : role === 'admin' ? (
@@ -122,7 +144,41 @@ export default function Home() {
             </>
           )}
         </div>
+
+        {/* زر قائمة الجوال ☰ */}
+        <button
+          className="mobile-menu-btn"
+          onClick={() => setMenuOpen(!menuOpen)}
+          style={{background:'#0D3B5E',color:'#fff',border:'none',width:'44px',height:'44px',borderRadius:'10px',cursor:'pointer',fontSize:'22px',display:'none',alignItems:'center',justifyContent:'center'}}
+        >
+          {menuOpen ? '✕' : '☰'}
+        </button>
       </nav>
+
+      {/* قائمة الجوال (تظهر عند الضغط على ☰) */}
+      <div
+        className={`mobile-menu ${menuOpen ? 'open' : ''}`}
+        style={{display:'none',background:'#fff',borderBottom:'1px solid #E2E8F0',padding:'12px 5%',position:'sticky',top:'80px',zIndex:99}}
+      >
+        <a href="/companies" style={navLinkStyle}>🏢 الشركات</a>
+        <a href="/jobs" style={navLinkStyle}>💼 الوظائف</a>
+        {!user ? (
+          <>
+            <a href="/login" style={navLinkStyle}>🔑 تسجيل دخول</a>
+            <a href="/add-company" style={{...navLinkStyle, background:'#0D3B5E', color:'#fff', borderRadius:'8px', textAlign:'center' as const, marginTop:'8px'}}>➕ سجّل شركتك</a>
+          </>
+        ) : role === 'admin' ? (
+          <>
+            <a href="/admin" style={{...navLinkStyle, background:'#C8831A', color:'#fff', borderRadius:'8px', textAlign:'center' as const, marginTop:'8px'}}>👑 لوحة الأدمن</a>
+            <button onClick={handleLogout} style={{...navLinkStyle, background:'transparent', border:'1px solid #E2E8F0', borderRadius:'8px', width:'100%', textAlign:'center' as const, marginTop:'8px', cursor:'pointer', fontFamily:'Arial,sans-serif'}}>🚪 خروج</button>
+          </>
+        ) : (
+          <>
+            <a href="/dashboard" style={{...navLinkStyle, background:'#0D3B5E', color:'#fff', borderRadius:'8px', textAlign:'center' as const, marginTop:'8px'}}>👤 حسابي</a>
+            <button onClick={handleLogout} style={{...navLinkStyle, background:'transparent', border:'1px solid #E2E8F0', borderRadius:'8px', width:'100%', textAlign:'center' as const, marginTop:'8px', cursor:'pointer', fontFamily:'Arial,sans-serif'}}>🚪 خروج</button>
+          </>
+        )}
+      </div>
 
       <div style={{background:'linear-gradient(135deg,#0D3B5E 0%,#0A2A44 60%,#1A5C30 100%)',padding:'80px 5%',textAlign:'center'}}>
         <div style={{display:'inline-block',background:'rgba(200,131,26,.2)',border:'1px solid rgba(200,131,26,.4)',color:'#F5C06A',padding:'6px 16px',borderRadius:'20px',fontSize:'13px',marginBottom:'20px'}}>✦ دليل الأعمال الرائد في المنطقة</div>
@@ -201,21 +257,13 @@ export default function Home() {
           </div>
 
           <div>
-            <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>
-              تواصل معنا
-            </div>
-            <a href="mailto:jaz.ceeo99@gmail.com" style={{display:'flex',alignItems:'center',gap:'8px',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'10px'}}>
-              📧 jaz.ceeo99@gmail.com
-            </a>
-            <a href="tel:0536187768" style={{display:'flex',alignItems:'center',gap:'8px',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>
-              📱 0536187768
-            </a>
+            <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>تواصل معنا</div>
+            <a href="mailto:jaz.ceeo99@gmail.com" style={{display:'flex',alignItems:'center',gap:'8px',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'10px'}}>📧 jaz.ceeo99@gmail.com</a>
+            <a href="tel:0536187768" style={{display:'flex',alignItems:'center',gap:'8px',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>📱 0536187768</a>
           </div>
 
           <div>
-            <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>
-              روابط سريعة
-            </div>
+            <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>روابط سريعة</div>
             <a href="/companies" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الشركات</a>
             <a href="/jobs" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الوظائف</a>
             <a href="/add-company" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>سجّل شركتك</a>
