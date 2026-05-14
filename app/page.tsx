@@ -87,11 +87,16 @@ export default function Home() {
 
   return (
     <main dir="rtl" style={{fontFamily:'Arial,sans-serif',background:'#F7F8FA',minHeight:'100vh'}}>
-      <nav style={{background:'#fff',padding:'12px 5%',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid #E2E8F0',position:'sticky',top:0,zIndex:100}}>
+      <nav style={{background:'#fff',padding:'16px 5%',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid #E2E8F0',position:'sticky',top:0,zIndex:100}}>
 
-        {/* 🆕 شعار الصورة */}
-        <a href="/" style={{display:'inline-flex',alignItems:'center',textDecoration:'none'}}>
-          <img src="/logo.png" alt="JAZ - دليل جازان" style={{height:'55px',width:'auto'}} />
+        {/* الشعار النصي */}
+        <a href="/" style={{display:'inline-flex',alignItems:'center',background:'#0D3B5E',padding:'8px 18px',borderRadius:'10px',gap:'8px',textDecoration:'none'}}>
+          <span style={{fontSize:'24px',fontWeight:'800',color:'#fff'}}>J</span>
+          <span style={{width:'1px',height:'24px',background:'#F5A623'}}></span>
+          <span style={{fontSize:'24px',fontWeight:'800',color:'#F5A623'}}>A</span>
+          <span style={{width:'1px',height:'24px',background:'#F5A623'}}></span>
+          <span style={{fontSize:'24px',fontWeight:'800',color:'#fff'}}>Z</span>
+          <span style={{fontSize:'14px',color:'#F5A623',fontWeight:'700',marginRight:'4px'}}>جاز</span>
         </a>
 
         <div style={{display:'flex',gap:'12px',alignItems:'center',flexWrap:'wrap'}}>
@@ -182,7 +187,14 @@ export default function Home() {
         <div style={{maxWidth:'1200px',margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:'30px',marginBottom:'24px'}}>
 
           <div>
-            <img src="/logo.png" alt="JAZ" style={{height:'60px',width:'auto',marginBottom:'12px'}} />
+            <div style={{display:'inline-flex',alignItems:'center',background:'#0D3B5E',padding:'8px 18px',borderRadius:'10px',gap:'8px',marginBottom:'10px'}}>
+              <span style={{fontSize:'20px',fontWeight:'800',color:'#fff'}}>J</span>
+              <span style={{width:'1px',height:'20px',background:'#F5A623'}}></span>
+              <span style={{fontSize:'20px',fontWeight:'800',color:'#F5A623'}}>A</span>
+              <span style={{width:'1px',height:'20px',background:'#F5A623'}}></span>
+              <span style={{fontSize:'20px',fontWeight:'800',color:'#fff'}}>Z</span>
+              <span style={{fontSize:'13px',color:'#F5A623',fontWeight:'700',marginRight:'4px'}}>جاز</span>
+            </div>
             <p style={{color:'rgba(255,255,255,.5)',fontSize:'13px',lineHeight:'1.7',margin:0}}>
               دليل الأعمال والوظائف في منطقة جازان
             </p>
