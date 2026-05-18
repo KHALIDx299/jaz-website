@@ -3,8 +3,9 @@ import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
   title: 'JAZ | دليل الأعمال والوظائف في جازان',
-  description: 'منصة JAZ - الدليل الأول للشركات والوظائف والفرص الاستثمارية في منطقة جازان. اكتشف +35 شركة في مختلف القطاعات.',
+  description: 'منصة JAZ - الدليل الأول للشركات والوظائف والفرص الاستثمارية في منطقة جازان. اكتشف +38 شركة في مختلف القطاعات.',
   keywords: ['جازان', 'دليل جازان', 'شركات جازان', 'وظائف جازان', 'JAZ', 'jazguide'],
+  metadataBase: new URL('https://jazguide.com'),
 
   openGraph: {
     title: 'JAZ | دليل الأعمال والوظائف في جازان',
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
     siteName: 'JAZ - دليل جازان',
     images: [
       {
-        url: 'https://jazguide.com/logo.png',
+        url: '/logo.png',
         width: 800,
         height: 800,
         alt: 'JAZ - دليل جازان',
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'JAZ | دليل الأعمال والوظائف في جازان',
     description: 'منصتك الذكية للعثور على الشركات والوظائف والفرص في جازان',
-    images: ['https://jazguide.com/logo.png'],
+    images: ['/logo.png'],
   },
 }
 
