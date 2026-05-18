@@ -26,6 +26,39 @@ export default function Jobs() {
     setLoading(false)
   }
 
+  // 🆕 دالة حساب الوقت منذ النشر
+  function timeAgo(dateString) {
+    if (!dateString) return ''
+    const now = new Date()
+    const date = new Date(dateString)
+    const seconds = Math.floor((now - date) / 1000)
+
+    if (seconds < 60) return 'منذ لحظات'
+    const minutes = Math.floor(seconds / 60)
+    if (minutes < 60) return `منذ ${minutes} ${minutes === 1 ? 'دقيقة' : minutes === 2 ? 'دقيقتين' : minutes <= 10 ? 'دقائق' : 'دقيقة'}`
+    const hours = Math.floor(minutes / 60)
+    if (hours < 24) return `منذ ${hours} ${hours === 1 ? 'ساعة' : hours === 2 ? 'ساعتين' : hours <= 10 ? 'ساعات' : 'ساعة'}`
+    const days = Math.floor(hours / 24)
+    if (days < 7) return `منذ ${days} ${days === 1 ? 'يوم' : days === 2 ? 'يومين' : days <= 10 ? 'أيام' : 'يوم'}`
+    const weeks = Math.floor(days / 7)
+    if (weeks < 4) return `منذ ${weeks} ${weeks === 1 ? 'أسبوع' : weeks === 2 ? 'أسبوعين' : weeks <= 4 ? 'أسابيع' : 'أسبوع'}`
+    const months = Math.floor(days / 30)
+    if (months < 12) return `منذ ${months} ${months === 1 ? 'شهر' : months === 2 ? 'شهرين' : months <= 10 ? 'أشهر' : 'شهر'}`
+    const years = Math.floor(days / 365)
+    return `منذ ${years} ${years === 1 ? 'سنة' : years === 2 ? 'سنتين' : 'سنوات'}`
+  }
+
+  // 🆕 دالة تحديد لون الشارة
+  function getTimeColor(dateString) {
+    if (!dateString) return { bg: '#E2E8F0', color: '#5A6475' }
+    const seconds = Math.floor((new Date() - new Date(dateString)) / 1000)
+    const days = seconds / 86400
+    if (days < 1) return { bg: '#DCFCE7', color: '#15803D' }  // أخضر - جديد جداً
+    if (days < 7) return { bg: '#DBEAFE', color: '#1E40AF' }  // أزرق - هذا الأسبوع
+    if (days < 30) return { bg: '#FEF3C7', color: '#92400E' } // أصفر - هذا الشهر
+    return { bg: '#F3F4F6', color: '#6B7280' }                // رمادي - قديم
+  }
+
   async function handleSubmit() {
     if (!form.title || !form.company_name) {
       alert('من فضلك أدخل العنوان والشركة')
@@ -112,16 +145,24 @@ export default function Jobs() {
           <p style={{textAlign:'center', color:'#888', padding:'40px'}}>لا توجد وظائف حالياً</p>
         ) : (
           <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(300px, 1fr))', gap:'16px'}}>
-            {jobs.map(job => (
-              <a key={job.id} href={`/jobs/${job.id}`} style={{background:'#fff', borderRadius:'14px', padding:'20px', textDecoration:'none', boxShadow:'0 4px 12px rgba(0,0,0,0.06)', border:'1px solid #E2E8F0', transition:'all .2s', display:'block'}}
+            {jobs.map(job => {
+              const timeColor = getTimeColor(job.created_at)
+              return (
+              <a key={job.id} href={`/jobs/${job.id}`} style={{background:'#fff', borderRadius:'14px', padding:'20px', textDecoration:'none', boxShadow:'0 4px 12px rgba(0,0,0,0.06)', border:'1px solid #E2E8F0', transition:'all .2s', display:'block', position:'relative'}}
                 onMouseEnter={e=>{ e.currentTarget.style.transform='translateY(-3px)'; e.currentTarget.style.boxShadow='0 8px 20px rgba(0,0,0,0.1)' }}
                 onMouseLeave={e=>{ e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 4px 12px rgba(0,0,0,0.06)' }}
               >
-                {job.job_type && (
-                  <span style={{background:'#E8F5E9', color:'#2E7D32', padding:'4px 10px', borderRadius:'12px', fontSize:'11px', fontWeight:'600', display:'inline-block', marginBottom:'10px'}}>
-                    {job.job_type}
+                <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:'10px', gap:'8px'}}>
+                  {job.job_type && (
+                    <span style={{background:'#E8F5E9', color:'#2E7D32', padding:'4px 10px', borderRadius:'12px', fontSize:'11px', fontWeight:'600', display:'inline-block'}}>
+                      {job.job_type}
+                    </span>
+                  )}
+                  {/* 🆕 شارة الوقت */}
+                  <span style={{background:timeColor.bg, color:timeColor.color, padding:'4px 10px', borderRadius:'12px', fontSize:'11px', fontWeight:'700', whiteSpace:'nowrap'}}>
+                    🕐 {timeAgo(job.created_at)}
                   </span>
-                )}
+                </div>
                 <h3 style={{fontSize:'1.1rem', fontWeight:'700', color:'#1A1F2E', margin:'0 0 8px'}}>{job.title}</h3>
                 {job.company_name && <p style={{color:'#5A6475', fontSize:'13px', margin:'0 0 4px'}}>🏢 {job.company_name}</p>}
                 {job.location && <p style={{color:'#5A6475', fontSize:'13px', margin:'0 0 8px'}}>📍 {job.location}</p>}
@@ -132,7 +173,8 @@ export default function Jobs() {
                   </div>
                 )}
               </a>
-            ))}
+              )
+            })}
           </div>
         )}
 
