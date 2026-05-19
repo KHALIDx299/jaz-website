@@ -110,7 +110,6 @@ export default function Home() {
 
       <nav style={{background:'#fff',padding:'16px 5%',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid #E2E8F0',position:'sticky',top:0,zIndex:100}}>
 
-        {/* الشعار */}
         <a href="/" style={{display:'inline-flex',alignItems:'center',background:'#0D3B5E',padding:'8px 18px',borderRadius:'10px',gap:'8px',textDecoration:'none'}}>
           <span style={{fontSize:'24px',fontWeight:'800',color:'#fff'}}>J</span>
           <span style={{width:'1px',height:'24px',background:'#F5A623'}}></span>
@@ -120,7 +119,6 @@ export default function Home() {
           <span style={{fontSize:'14px',color:'#F5A623',fontWeight:'700',marginRight:'4px'}}>جاز</span>
         </a>
 
-        {/* قائمة الكمبيوتر */}
         <div className="desktop-nav">
           <a href="/companies" style={navLinkStyle}>الشركات</a>
           <a href="/jobs" style={navLinkStyle}>الوظائف</a>
@@ -145,7 +143,6 @@ export default function Home() {
           )}
         </div>
 
-        {/* زر قائمة الجوال ☰ */}
         <button
           className="mobile-menu-btn"
           onClick={() => setMenuOpen(!menuOpen)}
@@ -155,7 +152,6 @@ export default function Home() {
         </button>
       </nav>
 
-      {/* قائمة الجوال (تظهر عند الضغط على ☰) */}
       <div
         className={`mobile-menu ${menuOpen ? 'open' : ''}`}
         style={{display:'none',background:'#fff',borderBottom:'1px solid #E2E8F0',padding:'12px 5%',position:'sticky',top:'80px',zIndex:99}}
@@ -180,17 +176,31 @@ export default function Home() {
         )}
       </div>
 
-      <div style={{background:'linear-gradient(135deg,#0D3B5E 0%,#0A2A44 60%,#1A5C30 100%)',padding:'80px 5%',textAlign:'center'}}>
-        <div style={{display:'inline-block',background:'rgba(200,131,26,.2)',border:'1px solid rgba(200,131,26,.4)',color:'#F5C06A',padding:'6px 16px',borderRadius:'20px',fontSize:'13px',marginBottom:'20px'}}>✦ دليل الأعمال الرائد في المنطقة</div>
-        <h1 style={{fontSize:'clamp(28px,5vw,52px)',fontWeight:'800',color:'#fff',marginBottom:'16px',lineHeight:'1.2'}}>JAZ: تواصل مع <span style={{color:'#F5A623'}}>مستقبل جازان</span></h1>
-        <p style={{color:'rgba(255,255,255,.7)',fontSize:'18px',marginBottom:'36px'}}>منصتك الذكية للعثور على الشركات والوظائف والفرص في جازان</p>
+      {/* 🆕 قسم الـ Hero مع صورة الخلفية العريضة */}
+      <div style={{
+        position:'relative',
+        backgroundImage:`linear-gradient(135deg, rgba(13,59,94,0.85) 0%, rgba(10,42,68,0.80) 60%, rgba(26,92,48,0.85) 100%), url('/hero-bg.jpg')`,
+        backgroundSize:'cover',
+        backgroundPosition:'center',
+        backgroundRepeat:'no-repeat',
+        padding:'100px 5%',
+        textAlign:'center',
+        minHeight:'500px',
+        display:'flex',
+        flexDirection:'column',
+        justifyContent:'center',
+        alignItems:'center'
+      }}>
+        <div style={{display:'inline-block',background:'rgba(200,131,26,.3)',border:'1px solid rgba(200,131,26,.5)',color:'#F5C06A',padding:'6px 16px',borderRadius:'20px',fontSize:'13px',marginBottom:'20px',backdropFilter:'blur(4px)'}}>✦ دليل الأعمال الرائد في المنطقة</div>
+        <h1 style={{fontSize:'clamp(28px,5vw,52px)',fontWeight:'800',color:'#fff',marginBottom:'16px',lineHeight:'1.2',textShadow:'0 2px 10px rgba(0,0,0,0.3)'}}>JAZ: تواصل مع <span style={{color:'#F5A623'}}>مستقبل جازان</span></h1>
+        <p style={{color:'rgba(255,255,255,.9)',fontSize:'18px',marginBottom:'36px',textShadow:'0 1px 5px rgba(0,0,0,0.3)',maxWidth:'600px'}}>منصتك الذكية للعثور على الشركات والوظائف والفرص في جازان</p>
 
-        <div style={{display:'flex',justifyContent:'center',gap:'0',marginBottom:'16px',maxWidth:'520px',margin:'0 auto 16px'}}>
-          <button onClick={()=>setSearchType('companies')} style={{flex:1,padding:'11px',border:'none',borderRadius:'10px 0 0 10px',background:searchType==='companies'?'#C8831A':'rgba(255,255,255,.15)',color:'#fff',fontFamily:'Arial,sans-serif',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>🏢 شركة</button>
-          <button onClick={()=>setSearchType('jobs')} style={{flex:1,padding:'11px',border:'none',borderRadius:'0 10px 10px 0',background:searchType==='jobs'?'#C8831A':'rgba(255,255,255,.15)',color:'#fff',fontFamily:'Arial,sans-serif',fontSize:'14px',fontWeight:'700',cursor:'pointer'}}>💼 وظيفة</button>
+        <div style={{display:'flex',justifyContent:'center',gap:'0',marginBottom:'16px',maxWidth:'520px',width:'100%'}}>
+          <button onClick={()=>setSearchType('companies')} style={{flex:1,padding:'11px',border:'none',borderRadius:'10px 0 0 10px',background:searchType==='companies'?'#C8831A':'rgba(255,255,255,.2)',color:'#fff',fontFamily:'Arial,sans-serif',fontSize:'14px',fontWeight:'700',cursor:'pointer',backdropFilter:'blur(4px)'}}>🏢 شركة</button>
+          <button onClick={()=>setSearchType('jobs')} style={{flex:1,padding:'11px',border:'none',borderRadius:'0 10px 10px 0',background:searchType==='jobs'?'#C8831A':'rgba(255,255,255,.2)',color:'#fff',fontFamily:'Arial,sans-serif',fontSize:'14px',fontWeight:'700',cursor:'pointer',backdropFilter:'blur(4px)'}}>💼 وظيفة</button>
         </div>
 
-        <div style={{display:'flex',maxWidth:'520px',margin:'0 auto',background:'#fff',borderRadius:'12px',overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,.3)'}}>
+        <div style={{display:'flex',maxWidth:'520px',width:'100%',background:'#fff',borderRadius:'12px',overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,.4)'}}>
           <input id="searchInput" type="text" placeholder={searchType==='companies'?'ابحث عن شركة...':'ابحث عن وظيفة...'} style={{flex:1,padding:'16px 18px',border:'none',outline:'none',fontSize:'16px',direction:'rtl'}} onKeyDown={(e)=>{ if(e.key==='Enter') handleSearch() }} />
           <button onClick={handleSearch} style={{background:'#C8831A',color:'#fff',border:'none',padding:'14px 22px',fontSize:'15px',fontWeight:'700',cursor:'pointer'}}>🔍 بحث</button>
         </div>
