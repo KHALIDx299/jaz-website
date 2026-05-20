@@ -110,13 +110,14 @@ export default function Home() {
 
       <nav style={{background:'#fff',padding:'16px 5%',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid #E2E8F0',position:'sticky',top:0,zIndex:100}}>
 
-        <a href="/" style={{display:'inline-flex',alignItems:'center',background:'#0D3B5E',padding:'8px 18px',borderRadius:'10px',gap:'8px',textDecoration:'none'}}>
+        {/* الشعار - dir="ltr" عشان JAZ يطلع بالترتيب الصحيح */}
+        <a href="/" dir="ltr" style={{display:'inline-flex',alignItems:'center',background:'#0D3B5E',padding:'8px 18px',borderRadius:'10px',gap:'8px',textDecoration:'none'}}>
           <span style={{fontSize:'24px',fontWeight:'800',color:'#fff'}}>J</span>
           <span style={{width:'1px',height:'24px',background:'#F5A623'}}></span>
           <span style={{fontSize:'24px',fontWeight:'800',color:'#F5A623'}}>A</span>
           <span style={{width:'1px',height:'24px',background:'#F5A623'}}></span>
           <span style={{fontSize:'24px',fontWeight:'800',color:'#fff'}}>Z</span>
-          <span style={{fontSize:'14px',color:'#F5A623',fontWeight:'700',marginRight:'4px'}}>جاز</span>
+          <span style={{fontSize:'14px',color:'#F5A623',fontWeight:'700',marginLeft:'4px'}}>جاز</span>
         </a>
 
         <div className="desktop-nav">
@@ -176,7 +177,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* 🆕 قسم الـ Hero مع صورة الخلفية العريضة */}
       <div style={{
         position:'relative',
         backgroundImage:`linear-gradient(135deg, rgba(13,59,94,0.85) 0%, rgba(10,42,68,0.80) 60%, rgba(26,92,48,0.85) 100%), url('/hero-bg.jpg')`,
@@ -253,13 +253,14 @@ export default function Home() {
         <div style={{maxWidth:'1200px',margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:'30px',marginBottom:'24px'}}>
 
           <div>
-            <div style={{display:'inline-flex',alignItems:'center',background:'#0D3B5E',padding:'8px 18px',borderRadius:'10px',gap:'8px',marginBottom:'10px'}}>
+            {/* الشعار - dir="ltr" */}
+            <div dir="ltr" style={{display:'inline-flex',alignItems:'center',background:'#0D3B5E',padding:'8px 18px',borderRadius:'10px',gap:'8px',marginBottom:'10px'}}>
               <span style={{fontSize:'20px',fontWeight:'800',color:'#fff'}}>J</span>
               <span style={{width:'1px',height:'20px',background:'#F5A623'}}></span>
               <span style={{fontSize:'20px',fontWeight:'800',color:'#F5A623'}}>A</span>
               <span style={{width:'1px',height:'20px',background:'#F5A623'}}></span>
               <span style={{fontSize:'20px',fontWeight:'800',color:'#fff'}}>Z</span>
-              <span style={{fontSize:'13px',color:'#F5A623',fontWeight:'700',marginRight:'4px'}}>جاز</span>
+              <span style={{fontSize:'13px',color:'#F5A623',fontWeight:'700',marginLeft:'4px'}}>جاز</span>
             </div>
             <p style={{color:'rgba(255,255,255,.5)',fontSize:'13px',lineHeight:'1.7',margin:0}}>
               دليل الأعمال والوظائف في منطقة جازان
