@@ -12,6 +12,8 @@ export default function DashboardPage() {
   const [profile, setProfile] = useState(null)
   const [company, setCompany] = useState(null)
   const [jobs, setJobs] = useState([])
+  const [uploading, setUploading] = useState(false)
+  const [uploadMsg, setUploadMsg] = useState('')
 
   useEffect(() => {
     loadUserData()
@@ -61,6 +63,65 @@ export default function DashboardPage() {
     }
   }
 
+  // 🆕 رفع شعار الشركة
+  const handleLogoUpload = async (event) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // التحقق من نوع الملف
+    if (!file.type.startsWith('image/')) {
+      setUploadMsg('❌ من فضلك اختر صورة فقط')
+      return
+    }
+
+    // التحقق من الحجم (أقل من 2 ميجا)
+    if (file.size > 2 * 1024 * 1024) {
+      setUploadMsg('❌ حجم الصورة كبير، اختر صورة أقل من 2 ميجا')
+      return
+    }
+
+    setUploading(true)
+    setUploadMsg('')
+
+    try {
+      // اسم الملف: company-id + الامتداد
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${company.id}-${Date.now()}.${fileExt}`
+
+      // رفع الصورة لـ Storage
+      const { error: uploadError } = await supabase.storage
+        .from('company-logos')
+        .upload(fileName, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      // الحصول على الرابط العام
+      const { data: urlData } = supabase.storage
+        .from('company-logos')
+        .getPublicUrl(fileName)
+
+      const logoUrl = urlData.publicUrl
+
+      // حفظ الرابط في جدول الشركة
+      const { error: updateError } = await supabase
+        .from('companies')
+        .update({ logo_url: logoUrl })
+        .eq('id', company.id)
+
+      if (updateError) throw updateError
+
+      // تحديث الواجهة
+      setCompany({ ...company, logo_url: logoUrl })
+      setUploadMsg('✅ تم رفع الشعار بنجاح!')
+
+    } catch (err) {
+      console.error('Upload error:', err)
+      setUploadMsg('❌ حدث خطأ: ' + err.message)
+    } finally {
+      setUploading(false)
+    }
+  }
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.push('/')
@@ -83,7 +144,7 @@ export default function DashboardPage() {
       fontFamily: 'system-ui, sans-serif',
     }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        
+
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -106,9 +167,79 @@ export default function DashboardPage() {
 
         <div style={cardStyle}>
           <h2 style={{ color: 'white', marginTop: 0 }}>🏢 شركتي</h2>
-          
+
           {company ? (
             <div style={{ color: '#e2e8f0', lineHeight: 1.8 }}>
+
+              {/* 🆕 قسم شعار الشركة */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1.5rem',
+                marginBottom: '1.5rem',
+                flexWrap: 'wrap',
+                padding: '1.2rem',
+                background: 'rgba(255,255,255,0.03)',
+                borderRadius: '12px',
+                border: '1px solid rgba(255,255,255,0.08)'
+              }}>
+                {/* معاينة الشعار */}
+                <div style={{
+                  width: '90px',
+                  height: '90px',
+                  borderRadius: '16px',
+                  background: company.logo_url ? 'white' : 'linear-gradient(135deg, #0D3B5E, #1A5C30)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  border: '2px solid rgba(255,255,255,0.1)'
+                }}>
+                  {company.logo_url ? (
+                    <img src={company.logo_url} alt="شعار الشركة" style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                  ) : (
+                    <span style={{ color: 'white', fontSize: '2.5rem', fontWeight: 'bold' }}>
+                      {company.name?.charAt(0) || '🏢'}
+                    </span>
+                  )}
+                </div>
+
+                {/* زر الرفع */}
+                <div style={{ flex: 1, minWidth: '200px' }}>
+                  <h3 style={{ color: 'white', margin: '0 0 0.5rem 0', fontSize: '1.1rem' }}>
+                    {company.logo_url ? '🖼️ شعار شركتك' : '📤 أضف شعار شركتك'}
+                  </h3>
+                  <p style={{ color: '#a0aec0', fontSize: '0.85rem', margin: '0 0 0.8rem 0' }}>
+                    صورة مربعة بصيغة PNG أو JPG، أقل من 2 ميجا
+                  </p>
+                  <label style={{
+                    ...btnPrimary,
+                    display: 'inline-block',
+                    cursor: uploading ? 'not-allowed' : 'pointer',
+                    opacity: uploading ? 0.6 : 1
+                  }}>
+                    {uploading ? '⏳ جاري الرفع...' : (company.logo_url ? '🔄 تغيير الشعار' : '📤 رفع شعار')}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      disabled={uploading}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                  {uploadMsg && (
+                    <p style={{
+                      margin: '0.7rem 0 0 0',
+                      fontSize: '0.85rem',
+                      color: uploadMsg.startsWith('✅') ? '#22c55e' : '#fca5a5'
+                    }}>
+                      {uploadMsg}
+                    </p>
+                  )}
+                </div>
+              </div>
+
               <p><strong>الاسم:</strong> {company.name}</p>
               <p><strong>القطاع:</strong> {company.category || 'غير محدد'}</p>
               <p><strong>الحالة:</strong>{' '}

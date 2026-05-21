@@ -160,8 +160,12 @@ function CompanyCard({ company, index, getCategoryStyle, getLogoColor, getInitia
       )}
 
       <div style={{display:'flex', gap:'12px', marginBottom:'14px', alignItems:'flex-start'}}>
-        <div style={{width:'56px', height:'56px', borderRadius:'14px', background: logoColor, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:'22px', fontWeight:'800', flexShrink:0, boxShadow:'0 4px 12px rgba(0,0,0,0.15)'}}>
-          {getInitials(company.name)}
+       <div style={{width:'56px', height:'56px', borderRadius:'14px', background: company.logo_url ? '#fff' : logoColor, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:'22px', fontWeight:'800', flexShrink:0, boxShadow:'0 4px 12px rgba(0,0,0,0.15)', overflow:'hidden', border: company.logo_url ? '1px solid #E2E8F0' : 'none'}}>
+          {company.logo_url ? (
+            <img src={company.logo_url} alt={company.name} style={{width:'100%', height:'100%', objectFit:'contain'}} />
+          ) : (
+            getInitials(company.name)
+          )}
         </div>
         <div style={{flex:1, minWidth:0}}>
           <h3 style={{fontSize:'15px', fontWeight:'700', color:'#1A1F2E', margin:'0 0 4px', lineHeight:'1.3'}}>
