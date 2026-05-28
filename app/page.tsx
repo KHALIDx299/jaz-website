@@ -110,7 +110,6 @@ export default function Home() {
 
       <nav style={{background:'#fff',padding:'16px 5%',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid #E2E8F0',position:'sticky',top:0,zIndex:100}}>
 
-        {/* الشعار - dir="ltr" عشان JAZ يطلع بالترتيب الصحيح */}
         <a href="/" dir="ltr" style={{display:'inline-flex',alignItems:'center',background:'#0D3B5E',padding:'8px 18px',borderRadius:'10px',gap:'8px',textDecoration:'none'}}>
           <span style={{fontSize:'24px',fontWeight:'800',color:'#fff'}}>J</span>
           <span style={{width:'1px',height:'24px',background:'#F5A623'}}></span>
@@ -123,6 +122,7 @@ export default function Home() {
         <div className="desktop-nav">
           <a href="/companies" style={navLinkStyle}>الشركات</a>
           <a href="/jobs" style={navLinkStyle}>الوظائف</a>
+          <a href="/about" style={navLinkStyle}>من نحن</a>
 
           {loadingUser ? (
             <div style={{width:'180px',height:'40px'}}></div>
@@ -159,6 +159,8 @@ export default function Home() {
       >
         <a href="/companies" style={navLinkStyle}>🏢 الشركات</a>
         <a href="/jobs" style={navLinkStyle}>💼 الوظائف</a>
+        <a href="/about" style={navLinkStyle}>ℹ️ من نحن</a>
+        <a href="/contact" style={navLinkStyle}>📞 تواصل معنا</a>
         {!user ? (
           <>
             <a href="/login" style={navLinkStyle}>🔑 تسجيل دخول</a>
@@ -250,10 +252,9 @@ export default function Home() {
       </section>
 
       <footer style={{background:'#081522',color:'rgba(255,255,255,.4)',padding:'40px 5% 24px',fontSize:'14px'}}>
-        <div style={{maxWidth:'1200px',margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:'30px',marginBottom:'24px'}}>
+        <div style={{maxWidth:'1200px',margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:'30px',marginBottom:'24px'}}>
 
           <div>
-            {/* الشعار - dir="ltr" */}
             <div dir="ltr" style={{display:'inline-flex',alignItems:'center',background:'#0D3B5E',padding:'8px 18px',borderRadius:'10px',gap:'8px',marginBottom:'10px'}}>
               <span style={{fontSize:'20px',fontWeight:'800',color:'#fff'}}>J</span>
               <span style={{width:'1px',height:'20px',background:'#F5A623'}}></span>
@@ -278,6 +279,14 @@ export default function Home() {
             <a href="/companies" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الشركات</a>
             <a href="/jobs" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الوظائف</a>
             <a href="/add-company" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>سجّل شركتك</a>
+          </div>
+
+          <div>
+            <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>عن المنصة</div>
+            <a href="/about" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>من نحن</a>
+            <a href="/contact" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>تواصل معنا</a>
+            <a href="/privacy" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>سياسة الخصوصية</a>
+            <a href="/terms" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>شروط الاستخدام</a>
           </div>
 
         </div>
