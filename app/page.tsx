@@ -1,300 +1,198 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { supabase } from '../lib/supabase'
+import { useEffect, useState } from 'react'
+import { supabase } from '../../lib/supabase'
 
-export default function Home() {
-  const [searchType, setSearchType] = useState('companies')
-  const [user, setUser] = useState<any>(null)
-  const [role, setRole] = useState<string | null>(null)
-  const [loadingUser, setLoadingUser] = useState(true)
-  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({})
-  const [totalCompanies, setTotalCompanies] = useState(0)
-  const [totalJobs, setTotalJobs] = useState(0)
-  const [menuOpen, setMenuOpen] = useState(false)
+export default function Companies() {
+  const [companies, setCompanies] = useState([])
+  const [filteredCompanies, setFilteredCompanies] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [selectedCategory, setSelectedCategory] = useState('الكل')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [sortBy, setSortBy] = useState('newest')
 
   useEffect(() => {
-    checkUser()
-    fetchStats()
-    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session?.user) {
-        setUser(session.user)
-        fetchRole(session.user.id)
-      } else {
-        setUser(null)
-        setRole(null)
-      }
-    })
-    return () => { listener?.subscription.unsubscribe() }
+    fetchCompanies()
+    const params = new URLSearchParams(window.location.search)
+    const cat = params.get('category')
+    if (cat) setSelectedCategory(cat)
+    const q = params.get('q')
+    if (q) setSearchTerm(q)
   }, [])
 
-  async function checkUser() {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      setUser(user)
-      await fetchRole(user.id)
-    }
-    setLoadingUser(false)
-  }
+  useEffect(() => {
+    filterAndSort()
+  }, [companies, selectedCategory, searchTerm, sortBy])
 
-  async function fetchRole(userId: string) {
-    const { data } = await supabase.from('profiles').select('role').eq('id', userId).single()
-    if (data) setRole(data.role)
-  }
-
-  async function fetchStats() {
-    const { data: companies } = await supabase
+  async function fetchCompanies() {
+    const { data } = await supabase
       .from('companies')
-      .select('category')
+      .select('*')
       .eq('status', 'approved')
+      .order('created_at', { ascending: false })
+    setCompanies(data || [])
+    setLoading(false)
+  }
 
-    if (companies) {
-      setTotalCompanies(companies.length)
-      const counts: Record<string, number> = {}
-      companies.forEach(c => {
-        if (c.category) {
-          counts[c.category] = (counts[c.category] || 0) + 1
-        }
-      })
-      setCategoryCounts(counts)
+  function filterAndSort() {
+    let result = [...companies]
+    if (selectedCategory !== 'الكل') {
+      result = result.filter(c => c.category === selectedCategory)
     }
-
-    const { count: jobsCount } = await supabase
-      .from('jobs')
-      .select('*', { count: 'exact', head: true })
-    setTotalJobs(jobsCount || 0)
+    if (searchTerm.trim()) {
+      const term = searchTerm.trim().toLowerCase()
+      result = result.filter(c =>
+        (c.name && c.name.toLowerCase().includes(term)) ||
+        (c.description && c.description.toLowerCase().includes(term)) ||
+        (c.location && c.location.toLowerCase().includes(term))
+      )
+    }
+    if (sortBy === 'newest') {
+      result.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    } else if (sortBy === 'oldest') {
+      result.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+    } else if (sortBy === 'name') {
+      result.sort((a, b) => (a.name || '').localeCompare(b.name || ''))
+    }
+    setFilteredCompanies(result)
   }
 
-  async function handleLogout() {
-    await supabase.auth.signOut()
-    setUser(null)
-    setRole(null)
-    window.location.href = '/'
+  function getCategoryStyle(category) {
+    const styles = {
+      'الطاقة': { bg: '#FEF3C7', color: '#92400E', icon: '⚡' },
+      'تقنية المعلومات': { bg: '#DBEAFE', color: '#1E40AF', icon: '💻' },
+      'الزراعة والبن': { bg: '#DCFCE7', color: '#166534', icon: '☕' },
+      'السياحة والجزر': { bg: '#FCE7F3', color: '#9F1239', icon: '🏝' },
+      'الملاحة': { bg: '#CFFAFE', color: '#155E75', icon: '⚓' },
+      'الإنشاء': { bg: '#FED7AA', color: '#9A3412', icon: '🏗' },
+      'الجمعيات': { bg: '#EDE9FE', color: '#5B21B6', icon: '🤲' }
+    }
+    return styles[category] || { bg: '#E5E7EB', color: '#374151', icon: '🏢' }
   }
 
-  function handleSearch() {
-    const val = (document.getElementById('searchInput') as HTMLInputElement)?.value
-    if(val) window.location.href = `/${searchType}?q=${val}`
-    else window.location.href = `/${searchType}`
+  function getInitials(name) {
+    if (!name) return '?'
+    const cleaned = name.replace(/شركة|مؤسسة|مصنع|مكتب|جمعية/g, '').trim()
+    return cleaned.charAt(0) || '?'
   }
 
-  const categoryList = [
-    { icon: '☕', name: 'الزراعة والبن' },
-    { icon: '⚡', name: 'الطاقة' },
-    { icon: '💻', name: 'تقنية المعلومات' },
-    { icon: '🏝', name: 'السياحة والجزر' },
-    { icon: '⚓', name: 'الملاحة' },
-    { icon: '🏗', name: 'الإنشاء' }
-  ]
-
-  const navLinkStyle = {
-    color:'#0D3B5E',
-    textDecoration:'none',
-    fontSize:'14px',
-    fontWeight:'600' as const,
-    padding:'10px 14px',
-    display:'block'
+  function getLogoColor(name) {
+    const colors = ['#0D3B5E', '#C8831A', '#1A5C30', '#7B2D8E', '#BE3144', '#0F766E']
+    if (!name) return colors[0]
+    let sum = 0
+    for (let i = 0; i < name.length; i++) sum += name.charCodeAt(i)
+    return colors[sum % colors.length]
   }
+
+  const categories = ['الكل', 'الطاقة', 'تقنية المعلومات', 'الزراعة والبن', 'السياحة والجزر', 'الملاحة', 'الإنشاء', 'الجمعيات']
 
   return (
-    <main dir="rtl" style={{fontFamily:'Arial,sans-serif',background:'#F7F8FA',minHeight:'100vh'}}>
-      <style>{`
-        .desktop-nav { display: flex; gap: 12px; align-items: center; }
-        .mobile-menu-btn { display: none; }
-        .mobile-menu { display: none; }
-        @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-          .mobile-menu-btn { display: flex !important; }
-          .mobile-menu.open { display: block !important; }
-        }
-      `}</style>
+    <main dir="rtl" style={{minHeight:'100vh', background:'#F7F8FA', fontFamily:'Arial,sans-serif'}}>
+      <div style={{background:'linear-gradient(135deg, #0D3B5E 0%, #1A5C30 100%)', padding:'40px 5%', color:'#fff'}}>
+        <div style={{maxWidth:'1200px', margin:'0 auto'}}>
+          <a href="/" style={{color:'rgba(255,255,255,0.8)', fontSize:'14px', textDecoration:'none', display:'inline-block', marginBottom:'16px'}}>← الرجوع للرئيسية</a>
+          <h1 style={{fontSize:'28px', fontWeight:'800', margin:'0 0 8px'}}>🏢 دليل الشركات</h1>
+          <p style={{color:'rgba(255,255,255,0.8)', fontSize:'15px', margin:0}}>اكتشف أفضل الشركات في منطقة جازان</p>
+        </div>
+      </div>
 
-      <nav style={{background:'#fff',padding:'16px 5%',display:'flex',justifyContent:'space-between',alignItems:'center',borderBottom:'1px solid #E2E8F0',position:'sticky',top:0,zIndex:100}}>
+      <div style={{maxWidth:'1200px', margin:'0 auto', padding:'24px 5%'}}>
 
-        <a href="/" dir="ltr" style={{display:'inline-flex',alignItems:'center',background:'#0D3B5E',padding:'8px 18px',borderRadius:'10px',gap:'8px',textDecoration:'none'}}>
-          <span style={{fontSize:'24px',fontWeight:'800',color:'#fff'}}>J</span>
-          <span style={{width:'1px',height:'24px',background:'#F5A623'}}></span>
-          <span style={{fontSize:'24px',fontWeight:'800',color:'#F5A623'}}>A</span>
-          <span style={{width:'1px',height:'24px',background:'#F5A623'}}></span>
-          <span style={{fontSize:'24px',fontWeight:'800',color:'#fff'}}>Z</span>
-          <span style={{fontSize:'14px',color:'#F5A623',fontWeight:'700',marginLeft:'4px'}}>جاز</span>
-        </a>
-
-        <div className="desktop-nav">
-          <a href="/companies" style={navLinkStyle}>الشركات</a>
-          <a href="/jobs" style={navLinkStyle}>الوظائف</a>
-          <a href="/about" style={navLinkStyle}>من نحن</a>
-
-          {loadingUser ? (
-            <div style={{width:'180px',height:'40px'}}></div>
-          ) : !user ? (
-            <>
-              <a href="/login" style={navLinkStyle}>تسجيل دخول</a>
-              <a href="/add-company" style={{background:'#0D3B5E',color:'#fff',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'700',textDecoration:'none'}}>سجّل شركتك</a>
-            </>
-          ) : role === 'admin' ? (
-            <>
-              <a href="/admin" style={{background:'#C8831A',color:'#fff',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'700',textDecoration:'none'}}>لوحة الأدمن 👑</a>
-              <button onClick={handleLogout} style={{background:'transparent',border:'1px solid #E2E8F0',color:'#5A6475',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'600',cursor:'pointer',fontFamily:'Arial,sans-serif'}}>خروج</button>
-            </>
-          ) : (
-            <>
-              <a href="/dashboard" style={{background:'#0D3B5E',color:'#fff',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'700',textDecoration:'none'}}>حسابي</a>
-              <button onClick={handleLogout} style={{background:'transparent',border:'1px solid #E2E8F0',color:'#5A6475',padding:'10px 20px',borderRadius:'8px',fontSize:'14px',fontWeight:'600',cursor:'pointer',fontFamily:'Arial,sans-serif'}}>خروج</button>
-            </>
-          )}
+        <div style={{background:'#fff', borderRadius:'14px', padding:'18px', marginBottom:'20px', boxShadow:'0 2px 8px rgba(0,0,0,0.04)', display:'grid', gridTemplateColumns:'1fr auto', gap:'12px', alignItems:'center'}}>
+          <input type="text" placeholder="🔍 ابحث عن شركة..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} style={{padding:'12px 16px', border:'1px solid #E2E8F0', borderRadius:'10px', fontSize:'14px', outline:'none', fontFamily:'Arial,sans-serif', direction:'rtl'}} />
+          <select value={sortBy} onChange={e => setSortBy(e.target.value)} style={{padding:'12px 16px', border:'1px solid #E2E8F0', borderRadius:'10px', fontSize:'14px', outline:'none', fontFamily:'Arial,sans-serif', cursor:'pointer', background:'#fff'}}>
+            <option value="newest">الأحدث أولاً</option>
+            <option value="oldest">الأقدم أولاً</option>
+            <option value="name">أبجدياً</option>
+          </select>
         </div>
 
-        <button
-          className="mobile-menu-btn"
-          onClick={() => setMenuOpen(!menuOpen)}
-          style={{background:'#0D3B5E',color:'#fff',border:'none',width:'44px',height:'44px',borderRadius:'10px',cursor:'pointer',fontSize:'22px',display:'none',alignItems:'center',justifyContent:'center'}}
-        >
-          {menuOpen ? '✕' : '☰'}
-        </button>
-      </nav>
+        <div style={{display:'flex', gap:'8px', marginBottom:'20px', flexWrap:'wrap'}}>
+          {categories.map(cat => {
+            const isActive = selectedCategory === cat
+            const style = cat !== 'الكل' ? getCategoryStyle(cat) : null
+            const label = cat !== 'الكل' && style ? style.icon + ' ' + cat : '🏢 ' + cat
+            return (
+              <button key={cat} onClick={() => setSelectedCategory(cat)} style={{padding:'10px 18px', borderRadius:'24px', border: isActive ? '2px solid #0D3B5E' : '1px solid #E2E8F0', background: isActive ? '#0D3B5E' : '#fff', color: isActive ? '#fff' : '#0D3B5E', fontSize:'13px', fontWeight:'700', cursor:'pointer', fontFamily:'Arial,sans-serif'}}>
+                {label}
+              </button>
+            )
+          })}
+        </div>
 
-      <div
-        className={`mobile-menu ${menuOpen ? 'open' : ''}`}
-        style={{display:'none',background:'#fff',borderBottom:'1px solid #E2E8F0',padding:'12px 5%',position:'sticky',top:'80px',zIndex:99}}
-      >
-        <a href="/companies" style={navLinkStyle}>🏢 الشركات</a>
-        <a href="/jobs" style={navLinkStyle}>💼 الوظائف</a>
-        <a href="/about" style={navLinkStyle}>ℹ️ من نحن</a>
-        <a href="/contact" style={navLinkStyle}>📞 تواصل معنا</a>
-        {!user ? (
-          <>
-            <a href="/login" style={navLinkStyle}>🔑 تسجيل دخول</a>
-            <a href="/add-company" style={{...navLinkStyle, background:'#0D3B5E', color:'#fff', borderRadius:'8px', textAlign:'center' as const, marginTop:'8px'}}>➕ سجّل شركتك</a>
-          </>
-        ) : role === 'admin' ? (
-          <>
-            <a href="/admin" style={{...navLinkStyle, background:'#C8831A', color:'#fff', borderRadius:'8px', textAlign:'center' as const, marginTop:'8px'}}>👑 لوحة الأدمن</a>
-            <button onClick={handleLogout} style={{...navLinkStyle, background:'transparent', border:'1px solid #E2E8F0', borderRadius:'8px', width:'100%', textAlign:'center' as const, marginTop:'8px', cursor:'pointer', fontFamily:'Arial,sans-serif'}}>🚪 خروج</button>
-          </>
+        <div style={{color:'#5A6475', fontSize:'14px', marginBottom:'16px'}}>
+          {loading ? 'جاري التحميل...' : <span>عرض <strong style={{color:'#0D3B5E'}}>{filteredCompanies.length}</strong> من أصل <strong style={{color:'#0D3B5E'}}>{companies.length}</strong> شركة</span>}
+        </div>
+
+        {loading ? (
+          <div style={{textAlign:'center', padding:'60px', color:'#888'}}>جاري التحميل...</div>
+        ) : filteredCompanies.length === 0 ? (
+          <div style={{textAlign:'center', padding:'60px', background:'#fff', borderRadius:'14px', color:'#888'}}>
+            <div style={{fontSize:'48px', marginBottom:'12px'}}>🔍</div>
+            <p style={{fontSize:'16px', margin:0}}>لا توجد شركات تطابق البحث</p>
+          </div>
         ) : (
-          <>
-            <a href="/dashboard" style={{...navLinkStyle, background:'#0D3B5E', color:'#fff', borderRadius:'8px', textAlign:'center' as const, marginTop:'8px'}}>👤 حسابي</a>
-            <button onClick={handleLogout} style={{...navLinkStyle, background:'transparent', border:'1px solid #E2E8F0', borderRadius:'8px', width:'100%', textAlign:'center' as const, marginTop:'8px', cursor:'pointer', fontFamily:'Arial,sans-serif'}}>🚪 خروج</button>
-          </>
+          <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fill, minmax(280px, 1fr))', gap:'16px'}}>
+            {filteredCompanies.map((company, index) => (
+              <CompanyCard key={company.id} company={company} index={index} getCategoryStyle={getCategoryStyle} getLogoColor={getLogoColor} getInitials={getInitials} />
+            ))}
+          </div>
         )}
       </div>
-
-      <div style={{
-        position:'relative',
-        backgroundImage:`linear-gradient(135deg, rgba(13,59,94,0.85) 0%, rgba(10,42,68,0.80) 60%, rgba(26,92,48,0.85) 100%), url('/hero-bg.jpg')`,
-        backgroundSize:'cover',
-        backgroundPosition:'center',
-        backgroundRepeat:'no-repeat',
-        padding:'100px 5%',
-        textAlign:'center',
-        minHeight:'500px',
-        display:'flex',
-        flexDirection:'column',
-        justifyContent:'center',
-        alignItems:'center'
-      }}>
-        <div style={{display:'inline-block',background:'rgba(200,131,26,.3)',border:'1px solid rgba(200,131,26,.5)',color:'#F5C06A',padding:'6px 16px',borderRadius:'20px',fontSize:'13px',marginBottom:'20px',backdropFilter:'blur(4px)'}}>✦ دليل الأعمال الرائد في المنطقة</div>
-        <h1 style={{fontSize:'clamp(28px,5vw,52px)',fontWeight:'800',color:'#fff',marginBottom:'16px',lineHeight:'1.2',textShadow:'0 2px 10px rgba(0,0,0,0.3)'}}>JAZ: تواصل مع <span style={{color:'#F5A623'}}>مستقبل جازان</span></h1>
-        <p style={{color:'rgba(255,255,255,.9)',fontSize:'18px',marginBottom:'36px',textShadow:'0 1px 5px rgba(0,0,0,0.3)',maxWidth:'600px'}}>منصتك الذكية للعثور على الشركات والوظائف والفرص في جازان</p>
-
-        <div style={{display:'flex',justifyContent:'center',gap:'0',marginBottom:'16px',maxWidth:'520px',width:'100%'}}>
-          <button onClick={()=>setSearchType('companies')} style={{flex:1,padding:'11px',border:'none',borderRadius:'10px 0 0 10px',background:searchType==='companies'?'#C8831A':'rgba(255,255,255,.2)',color:'#fff',fontFamily:'Arial,sans-serif',fontSize:'14px',fontWeight:'700',cursor:'pointer',backdropFilter:'blur(4px)'}}>🏢 شركة</button>
-          <button onClick={()=>setSearchType('jobs')} style={{flex:1,padding:'11px',border:'none',borderRadius:'0 10px 10px 0',background:searchType==='jobs'?'#C8831A':'rgba(255,255,255,.2)',color:'#fff',fontFamily:'Arial,sans-serif',fontSize:'14px',fontWeight:'700',cursor:'pointer',backdropFilter:'blur(4px)'}}>💼 وظيفة</button>
-        </div>
-
-        <div style={{display:'flex',maxWidth:'520px',width:'100%',background:'#fff',borderRadius:'12px',overflow:'hidden',boxShadow:'0 8px 32px rgba(0,0,0,.4)'}}>
-          <input id="searchInput" type="text" placeholder={searchType==='companies'?'ابحث عن شركة...':'ابحث عن وظيفة...'} style={{flex:1,padding:'16px 18px',border:'none',outline:'none',fontSize:'16px',direction:'rtl'}} onKeyDown={(e)=>{ if(e.key==='Enter') handleSearch() }} />
-          <button onClick={handleSearch} style={{background:'#C8831A',color:'#fff',border:'none',padding:'14px 22px',fontSize:'15px',fontWeight:'700',cursor:'pointer'}}>🔍 بحث</button>
-        </div>
-      </div>
-
-      <div style={{display:'grid',gridTemplateColumns:'repeat(4,1fr)',background:'#fff',borderBottom:'1px solid #E2E8F0'}}>
-        {[
-          {num:`+${totalCompanies}`,label:'شركة مسجّلة'},
-          {num:`${Object.keys(categoryCounts).length}`,label:'قطاعاً اقتصادياً'},
-          {num:`+${totalJobs}`,label:'وظيفة متاحة'},
-          {num:'٩٨٪',label:'رضا المستخدمين'}
-        ].map((s,i)=>(
-          <div key={i} style={{padding:'24px 16px',textAlign:'center',borderLeft:i<3?'1px solid #E2E8F0':'none'}}>
-            <div style={{fontSize:'clamp(22px,4vw,32px)',fontWeight:'800',color:'#0D3B5E'}}>{s.num}</div>
-            <div style={{fontSize:'13px',color:'#5A6475',marginTop:'4px'}}>{s.label}</div>
-          </div>
-        ))}
-      </div>
-
-      <section style={{padding:'60px 5%',background:'#F7F8FA'}}>
-        <div style={{marginBottom:'36px'}}>
-          <div style={{width:'44px',height:'4px',background:'#C8831A',borderRadius:'2px',marginBottom:'12px'}}></div>
-          <div style={{fontSize:'12px',color:'#C8831A',fontWeight:'700',letterSpacing:'1px',marginBottom:'8px'}}>القطاعات</div>
-          <div style={{fontSize:'clamp(22px,4vw,32px)',fontWeight:'800',color:'#0D3B5E'}}>اكتشف قطاعات جازان</div>
-        </div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:'14px'}}>
-          {categoryList.map((cat,i)=>(
-            <a key={i} href={`/companies?category=${encodeURIComponent(cat.name)}`} style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:'14px',padding:'24px 14px',textAlign:'center',cursor:'pointer',textDecoration:'none',display:'block',transition:'all .2s'}}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#C8831A'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(200,131,26,0.15)' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
-            >
-              <div style={{fontSize:'36px',marginBottom:'10px'}}>{cat.icon}</div>
-              <div style={{fontSize:'14px',fontWeight:'700',color:'#0D3B5E'}}>{cat.name}</div>
-              <div style={{fontSize:'12px',color:'#888',marginTop:'4px'}}>{categoryCounts[cat.name] || 0} شركة</div>
-            </a>
-          ))}
-        </div>
-      </section>
-
-      <section style={{background:'linear-gradient(135deg,#0D3B5E,#0A2A44)',padding:'80px 5%',textAlign:'center'}}>
-        <h2 style={{fontSize:'clamp(22px,5vw,38px)',fontWeight:'800',color:'#fff',marginBottom:'12px'}}>ابدأ رحلتك مع JAZ اليوم</h2>
-        <p style={{color:'rgba(255,255,255,.7)',fontSize:'17px',marginBottom:'36px'}}>سجّل شركتك أو اكتشف وظيفة أحلامك في جازان</p>
-        <div style={{display:'flex',gap:'14px',justifyContent:'center',flexWrap:'wrap'}}>
-          <a href="/add-company" style={{background:'#C8831A',color:'#fff',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>🏢 سجّل شركتك مجاناً</a>
-          <a href="/jobs" style={{background:'transparent',color:'#fff',border:'2px solid rgba(255,255,255,.4)',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>💼 استعرض الوظائف</a>
-        </div>
-      </section>
-
-      <footer style={{background:'#081522',color:'rgba(255,255,255,.4)',padding:'40px 5% 24px',fontSize:'14px'}}>
-        <div style={{maxWidth:'1200px',margin:'0 auto',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:'30px',marginBottom:'24px'}}>
-
-          <div>
-            <div dir="ltr" style={{display:'inline-flex',alignItems:'center',background:'#0D3B5E',padding:'8px 18px',borderRadius:'10px',gap:'8px',marginBottom:'10px'}}>
-              <span style={{fontSize:'20px',fontWeight:'800',color:'#fff'}}>J</span>
-              <span style={{width:'1px',height:'20px',background:'#F5A623'}}></span>
-              <span style={{fontSize:'20px',fontWeight:'800',color:'#F5A623'}}>A</span>
-              <span style={{width:'1px',height:'20px',background:'#F5A623'}}></span>
-              <span style={{fontSize:'20px',fontWeight:'800',color:'#fff'}}>Z</span>
-              <span style={{fontSize:'13px',color:'#F5A623',fontWeight:'700',marginLeft:'4px'}}>جاز</span>
-            </div>
-            <p style={{color:'rgba(255,255,255,.5)',fontSize:'13px',lineHeight:'1.7',margin:0}}>
-              دليل الأعمال والوظائف في منطقة جازان
-            </p>
-          </div>
-
-          <div>
-            <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>تواصل معنا</div>
-            <a href="mailto:jaz.ceeo99@gmail.com" style={{display:'flex',alignItems:'center',gap:'8px',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'10px'}}>📧 jaz.ceeo99@gmail.com</a>
-            <a href="tel:0536187768" style={{display:'flex',alignItems:'center',gap:'8px',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>📱 0536187768</a>
-          </div>
-
-          <div>
-            <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>روابط سريعة</div>
-            <a href="/companies" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الشركات</a>
-            <a href="/jobs" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الوظائف</a>
-            <a href="/add-company" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>سجّل شركتك</a>
-          </div>
-
-          <div>
-            <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>عن المنصة</div>
-            <a href="/about" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>من نحن</a>
-            <a href="/contact" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>تواصل معنا</a>
-            <a href="/privacy" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>سياسة الخصوصية</a>
-            <a href="/terms" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>شروط الاستخدام</a>
-          </div>
-
-        </div>
-
-        <div style={{borderTop:'1px solid rgba(255,255,255,.1)',paddingTop:'20px',textAlign:'center'}}>
-          <span style={{color:'#F5A623',fontWeight:'700'}}>JAZ جاز</span> © ٢٠٢٥ — جميع الحقوق محفوظة
-        </div>
-      </footer>
     </main>
+  )
+}
+
+function CompanyCard({ company, index, getCategoryStyle, getLogoColor, getInitials }) {
+  const catStyle = getCategoryStyle(company.category)
+  const logoColor = getLogoColor(company.name)
+  const isFeatured = index < 3
+  const companyUrl = '/companies/' + company.id
+  const shortDesc = company.description && company.description.length > 120 ? company.description.substring(0, 120) + '...' : company.description
+
+  return (
+    <a href={companyUrl} style={{background:'#fff', borderRadius:'14px', padding:'20px', textDecoration:'none', boxShadow:'0 2px 8px rgba(0,0,0,0.06)', border:'1px solid #E2E8F0', transition:'all 0.25s', display:'block', position:'relative', overflow:'hidden'}}
+      onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 28px rgba(13,59,94,0.15)'; e.currentTarget.style.borderColor = '#C8831A' }}
+      onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.06)'; e.currentTarget.style.borderColor = '#E2E8F0' }}
+    >
+      {isFeatured && (
+        <div style={{position:'absolute', top:'12px', left:'12px', background:'linear-gradient(135deg, #F5A623, #C8831A)', color:'#fff', fontSize:'10px', fontWeight:'700', padding:'4px 10px', borderRadius:'12px', boxShadow:'0 2px 6px rgba(245,166,35,0.4)'}}>
+          ⭐ موصى به
+        </div>
+      )}
+
+      <div style={{display:'flex', gap:'12px', marginBottom:'14px', alignItems:'flex-start'}}>
+        <div style={{width:'56px', height:'56px', borderRadius:'14px', background: company.logo_url ? '#fff' : logoColor, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:'22px', fontWeight:'800', flexShrink:0, boxShadow:'0 4px 12px rgba(0,0,0,0.15)', overflow:'hidden', border: company.logo_url ? '1px solid #E2E8F0' : 'none'}}>
+          {company.logo_url ? (
+            <img src={company.logo_url} alt={company.name} style={{width:'100%', height:'100%', objectFit:'contain'}} />
+          ) : (
+            getInitials(company.name)
+          )}
+        </div>
+        <div style={{flex:1, minWidth:0}}>
+          <h3 style={{fontSize:'15px', fontWeight:'700', color:'#1A1F2E', margin:'0 0 4px', lineHeight:'1.3'}}>
+            {company.name}
+          </h3>
+          {company.location && <p style={{fontSize:'12px', color:'#5A6475', margin:0}}>📍 {company.location}</p>}
+        </div>
+      </div>
+
+      {company.category && (
+        <div style={{display:'inline-block', background: catStyle.bg, color: catStyle.color, padding:'5px 12px', borderRadius:'14px', fontSize:'12px', fontWeight:'600', marginBottom:'12px'}}>
+          {catStyle.icon} {company.category}
+        </div>
+      )}
+
+      {shortDesc && <p style={{fontSize:'13px', color:'#5A6475', margin:'0 0 14px', lineHeight:'1.6'}}>{shortDesc}</p>}
+
+      <div style={{display:'flex', gap:'8px', flexWrap:'wrap', borderTop:'1px solid #F0F0F0', paddingTop:'12px'}}>
+        {company.phone && <div style={{fontSize:'11px', color:'#5A6475', background:'#F7F8FA', padding:'4px 8px', borderRadius:'8px'}}>📞 متاح</div>}
+        {company.website && <div style={{fontSize:'11px', color:'#5A6475', background:'#F7F8FA', padding:'4px 8px', borderRadius:'8px'}}>🌐 موقع</div>}
+        {company.email && <div style={{fontSize:'11px', color:'#5A6475', background:'#F7F8FA', padding:'4px 8px', borderRadius:'8px'}}>✉️ إيميل</div>}
+      </div>
+
+      <div style={{marginTop:'14px', textAlign:'center', color:'#0D3B5E', fontSize:'13px', fontWeight:'700', padding:'8px', borderRadius:'8px', background:'#F7F8FA'}}>
+        عرض التفاصيل ←
+      </div>
+    </a>
   )
 }
