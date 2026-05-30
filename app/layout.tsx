@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "JAZ | دليل الأعمال والوظائف في جازان",
   description: "منصتك الذكية للعثور على الشركات والوظائف والفرص في جازان",
   icons: {
-    icon: '/icon.png',
+    icon: '/icon.svg',
   },
   openGraph: {
     title: "JAZ | دليل الأعمال والوظائف في جازان",
