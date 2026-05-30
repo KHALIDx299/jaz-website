@@ -63,14 +63,15 @@ export default function Companies() {
       'الزراعة والبن': { bg: '#DCFCE7', color: '#166534', icon: '☕' },
       'السياحة والجزر': { bg: '#FCE7F3', color: '#9F1239', icon: '🏝' },
       'الملاحة': { bg: '#CFFAFE', color: '#155E75', icon: '⚓' },
-      'الإنشاء': { bg: '#FED7AA', color: '#9A3412', icon: '🏗' }
+      'الإنشاء': { bg: '#FED7AA', color: '#9A3412', icon: '🏗' },
+      'الجمعيات': { bg: '#EDE9FE', color: '#5B21B6', icon: '🤲' }
     }
     return styles[category] || { bg: '#E5E7EB', color: '#374151', icon: '🏢' }
   }
 
   function getInitials(name) {
     if (!name) return '?'
-    const cleaned = name.replace(/شركة|مؤسسة|مصنع|مكتب/g, '').trim()
+    const cleaned = name.replace(/شركة|مؤسسة|مصنع|مكتب|جمعية/g, '').trim()
     return cleaned.charAt(0) || '?'
   }
 
@@ -82,7 +83,7 @@ export default function Companies() {
     return colors[sum % colors.length]
   }
 
-  const categories = ['الكل', 'الطاقة', 'تقنية المعلومات', 'الزراعة والبن', 'السياحة والجزر', 'الملاحة', 'الإنشاء']
+  const categories = ['الكل', 'الطاقة', 'تقنية المعلومات', 'الزراعة والبن', 'السياحة والجزر', 'الملاحة', 'الإنشاء', 'الجمعيات']
 
   return (
     <main dir="rtl" style={{minHeight:'100vh', background:'#F7F8FA', fontFamily:'Arial,sans-serif'}}>
@@ -160,7 +161,7 @@ function CompanyCard({ company, index, getCategoryStyle, getLogoColor, getInitia
       )}
 
       <div style={{display:'flex', gap:'12px', marginBottom:'14px', alignItems:'flex-start'}}>
-       <div style={{width:'56px', height:'56px', borderRadius:'14px', background: company.logo_url ? '#fff' : logoColor, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:'22px', fontWeight:'800', flexShrink:0, boxShadow:'0 4px 12px rgba(0,0,0,0.15)', overflow:'hidden', border: company.logo_url ? '1px solid #E2E8F0' : 'none'}}>
+        <div style={{width:'56px', height:'56px', borderRadius:'14px', background: company.logo_url ? '#fff' : logoColor, display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:'22px', fontWeight:'800', flexShrink:0, boxShadow:'0 4px 12px rgba(0,0,0,0.15)', overflow:'hidden', border: company.logo_url ? '1px solid #E2E8F0' : 'none'}}>
           {company.logo_url ? (
             <img src={company.logo_url} alt={company.name} style={{width:'100%', height:'100%', objectFit:'contain'}} />
           ) : (
