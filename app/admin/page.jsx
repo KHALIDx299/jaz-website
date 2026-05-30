@@ -14,6 +14,7 @@ export default function AdminPage() {
   const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0 })
   const [filter, setFilter] = useState('pending')
   const [actionLoading, setActionLoading] = useState(null)
+  const [uploadingId, setUploadingId] = useState(null)
 
   useEffect(() => {
     loadData()
@@ -66,38 +67,97 @@ export default function AdminPage() {
 
   const handleStatusChange = async (companyId, newStatus) => {
     setActionLoading(companyId)
-    
     const { error } = await supabase
       .from('companies')
       .update({ status: newStatus })
       .eq('id', companyId)
 
-    if (!error) {
-      await loadData()
-    } else {
-      alert('حدث خطأ: ' + error.message)
-    }
-    
+    if (!error) await loadData()
+    else alert('حدث خطأ: ' + error.message)
     setActionLoading(null)
   }
 
   const handleDelete = async (companyId, name) => {
     if (!confirm(`هل أنت متأكد من حذف "${name}"؟`)) return
-    
     setActionLoading(companyId)
-    
     const { error } = await supabase
       .from('companies')
       .delete()
       .eq('id', companyId)
 
+    if (!error) await loadData()
+    else alert('حدث خطأ: ' + error.message)
+    setActionLoading(null)
+  }
+
+  // 🆕 رفع شعار من لوحة الأدمن لأي شركة
+  const handleLogoUpload = async (event, companyId, companyName) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith('image/')) {
+      alert('❌ من فضلك اختر صورة فقط')
+      return
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert('❌ حجم الصورة كبير، اختر صورة أقل من 2 ميجا')
+      return
+    }
+
+    setUploadingId(companyId)
+
+    try {
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${companyId}-${Date.now()}.${fileExt}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('company-logos')
+        .upload(fileName, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      const { data: urlData } = supabase.storage
+        .from('company-logos')
+        .getPublicUrl(fileName)
+
+      const logoUrl = urlData.publicUrl
+
+      const { error: updateError } = await supabase
+        .from('companies')
+        .update({ logo_url: logoUrl })
+        .eq('id', companyId)
+
+      if (updateError) throw updateError
+
+      await loadData()
+      alert(`✅ تم رفع شعار "${companyName}" بنجاح!`)
+
+    } catch (err) {
+      console.error('Upload error:', err)
+      alert('❌ حدث خطأ: ' + err.message)
+    } finally {
+      setUploadingId(null)
+    }
+  }
+
+  // 🆕 حذف الشعار
+  const handleRemoveLogo = async (companyId, companyName) => {
+    if (!confirm(`هل تريد حذف شعار "${companyName}"؟`)) return
+
+    setUploadingId(companyId)
+    const { error } = await supabase
+      .from('companies')
+      .update({ logo_url: null })
+      .eq('id', companyId)
+
     if (!error) {
       await loadData()
+      alert('✅ تم حذف الشعار')
     } else {
-      alert('حدث خطأ: ' + error.message)
+      alert('❌ حدث خطأ: ' + error.message)
     }
-    
-    setActionLoading(null)
+    setUploadingId(null)
   }
 
   const handleLogout = async () => {
@@ -106,8 +166,8 @@ export default function AdminPage() {
     router.refresh()
   }
 
-  const filteredCompanies = filter === 'all' 
-    ? companies 
+  const filteredCompanies = filter === 'all'
+    ? companies
     : companies.filter(c => c.status === filter)
 
   if (loading) {
@@ -126,8 +186,7 @@ export default function AdminPage() {
       fontFamily: 'system-ui, sans-serif',
     }}>
       <div style={{ maxWidth: '1300px', margin: '0 auto' }}>
-        
-        {/* الشريط العلوي */}
+
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -149,7 +208,6 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* الإحصائيات */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -162,7 +220,6 @@ export default function AdminPage() {
           <StatCard label="مرفوضة" value={stats.rejected} color="#ef4444" />
         </div>
 
-        {/* الفلاتر */}
         <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
           <FilterBtn active={filter === 'pending'} onClick={() => setFilter('pending')}>
             ⏳ بانتظار الموافقة ({stats.pending})
@@ -178,10 +235,9 @@ export default function AdminPage() {
           </FilterBtn>
         </div>
 
-        {/* قائمة الشركات */}
         <div style={cardStyle}>
           <h2 style={{ color: 'white', marginTop: 0 }}>الشركات</h2>
-          
+
           {filteredCompanies.length === 0 ? (
             <p style={{ color: '#a0aec0' }}>لا توجد شركات في هذا التصنيف.</p>
           ) : (
@@ -194,29 +250,74 @@ export default function AdminPage() {
                   border: '1px solid rgba(255,255,255,0.05)',
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
-                    <div style={{ flex: 1, minWidth: '200px' }}>
-                      <h3 style={{ color: 'white', margin: '0 0 0.5rem 0', fontSize: '1.2rem' }}>
-                        {company.name}
-                      </h3>
-                      <div style={{ color: '#a0aec0', fontSize: '0.9rem', lineHeight: 1.7 }}>
-                        <div>📂 {company.category || 'غير محدد'}</div>
-                        {company.location && <div>📍 {company.location}</div>}
-                        {company.phone && <div>📞 {company.phone}</div>}
-                        {company.email && <div>📧 {company.email}</div>}
-                        {company.description && (
-                          <div style={{ marginTop: '0.5rem', color: '#cbd5e0' }}>
-                            {company.description}
-                          </div>
+
+                    {/* 🆕 الشعار + معلومات الشركة */}
+                    <div style={{ flex: 1, minWidth: '200px', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
+
+                      {/* صورة الشعار */}
+                      <div style={{
+                        width: '72px',
+                        height: '72px',
+                        borderRadius: '12px',
+                        background: company.logo_url ? '#fff' : 'linear-gradient(135deg, #0D3B5E, #1A5C30)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        overflow: 'hidden',
+                        flexShrink: 0,
+                        border: '2px solid rgba(255,255,255,0.1)'
+                      }}>
+                        {company.logo_url ? (
+                          <img src={company.logo_url} alt={company.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                        ) : (
+                          <span style={{ color: 'white', fontSize: '1.8rem', fontWeight: 'bold' }}>
+                            {company.name?.charAt(0) || '🏢'}
+                          </span>
                         )}
                       </div>
-                      <div style={{ marginTop: '0.7rem' }}>
-                        {company.status === 'pending' && <StatusBadge color="#f5a623">⏳ بانتظار</StatusBadge>}
-                        {company.status === 'approved' && <StatusBadge color="#22c55e">✅ موافق</StatusBadge>}
-                        {company.status === 'rejected' && <StatusBadge color="#ef4444">❌ مرفوضة</StatusBadge>}
+
+                      <div style={{ flex: 1 }}>
+                        <h3 style={{ color: 'white', margin: '0 0 0.5rem 0', fontSize: '1.2rem' }}>
+                          {company.name}
+                        </h3>
+                        <div style={{ color: '#a0aec0', fontSize: '0.9rem', lineHeight: 1.7 }}>
+                          <div>📂 {company.category || 'غير محدد'}</div>
+                          {company.location && <div>📍 {company.location}</div>}
+                          {company.phone && <div>📞 {company.phone}</div>}
+                          {company.email && <div>📧 {company.email}</div>}
+                        </div>
+                        <div style={{ marginTop: '0.7rem' }}>
+                          {company.status === 'pending' && <StatusBadge color="#f5a623">⏳ بانتظار</StatusBadge>}
+                          {company.status === 'approved' && <StatusBadge color="#22c55e">✅ موافق</StatusBadge>}
+                          {company.status === 'rejected' && <StatusBadge color="#ef4444">❌ مرفوضة</StatusBadge>}
+                        </div>
                       </div>
                     </div>
-                    
+
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+
+                      {/* 🆕 زر رفع/تغيير الشعار */}
+                      <label style={{ ...btnLogo, opacity: uploadingId === company.id ? 0.6 : 1, cursor: uploadingId === company.id ? 'not-allowed' : 'pointer' }}>
+                        {uploadingId === company.id ? '⏳ جاري الرفع...' : (company.logo_url ? '🔄 تغيير الشعار' : '🖼️ رفع شعار')}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleLogoUpload(e, company.id, company.name)}
+                          disabled={uploadingId === company.id}
+                          style={{ display: 'none' }}
+                        />
+                      </label>
+
+                      {company.logo_url && (
+                        <button
+                          onClick={() => handleRemoveLogo(company.id, company.name)}
+                          disabled={uploadingId === company.id}
+                          style={btnRemoveLogo}
+                        >
+                          🗑️ حذف الشعار
+                        </button>
+                      )}
+
                       {company.status !== 'approved' && (
                         <button
                           onClick={() => handleStatusChange(company.id, 'approved')}
@@ -244,6 +345,12 @@ export default function AdminPage() {
                       </button>
                     </div>
                   </div>
+
+                  {company.description && (
+                    <div style={{ marginTop: '1rem', color: '#cbd5e0', fontSize: '0.9rem', lineHeight: 1.6, borderTop: '1px solid rgba(255,255,255,0.05)', paddingTop: '1rem' }}>
+                      {company.description}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -362,4 +469,26 @@ const btnDelete = {
   border: '1px solid rgba(255,255,255,0.1)',
   cursor: 'pointer',
   fontSize: '0.85rem',
+}
+
+const btnLogo = {
+  background: 'linear-gradient(135deg, #C8831A, #F5A623)',
+  color: 'white',
+  padding: '0.5rem 1rem',
+  borderRadius: '8px',
+  border: 'none',
+  fontWeight: 'bold',
+  fontSize: '0.9rem',
+  textAlign: 'center',
+  display: 'inline-block',
+}
+
+const btnRemoveLogo = {
+  background: 'rgba(239,68,68,0.15)',
+  color: '#fca5a5',
+  padding: '0.4rem 0.8rem',
+  borderRadius: '8px',
+  border: '1px solid rgba(239,68,68,0.3)',
+  cursor: 'pointer',
+  fontSize: '0.8rem',
 }
