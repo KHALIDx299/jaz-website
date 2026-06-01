@@ -77,14 +77,50 @@ export default function Home() {
     else window.location.href = `/${searchType}`
   }
 
+  // 🆕 القطاعات مع الصور وألوان الـ Overlay
   const categoryList = [
-    { icon: '☕', name: 'الزراعة والبن' },
-    { icon: '⚡', name: 'الطاقة' },
-    { icon: '💻', name: 'تقنية المعلومات' },
-    { icon: '🏝', name: 'السياحة والجزر' },
-    { icon: '⚓', name: 'الملاحة' },
-    { icon: '🏗', name: 'الإنشاء' },
-    { icon: '🤲', name: 'الجمعيات' }
+    {
+      name: 'الزراعة والبن',
+      image: 'https://gpnkutppljklfwzmzhag.supabase.co/storage/v1/object/public/company-logos/sustainable-coffee-farming-view-r684p8xdvph0px8wgm0thgjjhgzswddz07i9685pfk.webp',
+      color: '#166534',
+      overlayColor: 'rgba(22,101,52,0.75)'
+    },
+    {
+      name: 'الطاقة',
+      image: 'https://gpnkutppljklfwzmzhag.supabase.co/storage/v1/object/public/company-logos/1234079.jpg',
+      color: '#92400E',
+      overlayColor: 'rgba(146,64,14,0.75)'
+    },
+    {
+      name: 'تقنية المعلومات',
+      image: 'https://gpnkutppljklfwzmzhag.supabase.co/storage/v1/object/public/company-logos/saudimad.webp',
+      color: '#1E40AF',
+      overlayColor: 'rgba(30,64,175,0.75)'
+    },
+    {
+      name: 'السياحة والجزر',
+      image: 'https://gpnkutppljklfwzmzhag.supabase.co/storage/v1/object/public/company-logos/367320.jpeg.webp',
+      color: '#9F1239',
+      overlayColor: 'rgba(159,18,57,0.75)'
+    },
+    {
+      name: 'الملاحة',
+      image: 'https://gpnkutppljklfwzmzhag.supabase.co/storage/v1/object/public/company-logos/1191992.png.webp',
+      color: '#155E75',
+      overlayColor: 'rgba(21,94,117,0.75)'
+    },
+    {
+      name: 'الإنشاء',
+      image: 'https://gpnkutppljklfwzmzhag.supabase.co/storage/v1/object/public/company-logos/Picture1-20.webp',
+      color: '#9A3412',
+      overlayColor: 'rgba(154,52,18,0.75)'
+    },
+    {
+      name: 'الجمعيات',
+      image: 'https://gpnkutppljklfwzmzhag.supabase.co/storage/v1/object/public/company-logos/d8acd985d8b9d98ad8a9-d8aed98ad8b1d98ad8a9.jpg',
+      color: '#5B21B6',
+      overlayColor: 'rgba(91,33,182,0.75)'
+    }
   ]
 
   const navLinkStyle = {
@@ -223,21 +259,30 @@ export default function Home() {
         ))}
       </div>
 
+      {/* 🆕 قسم القطاعات بصور حقيقية */}
       <section style={{padding:'60px 5%',background:'#F7F8FA'}}>
         <div style={{marginBottom:'36px'}}>
           <div style={{width:'44px',height:'4px',background:'#C8831A',borderRadius:'2px',marginBottom:'12px'}}></div>
           <div style={{fontSize:'12px',color:'#C8831A',fontWeight:'700',letterSpacing:'1px',marginBottom:'8px'}}>القطاعات</div>
           <div style={{fontSize:'clamp(22px,4vw,32px)',fontWeight:'800',color:'#0D3B5E'}}>اكتشف قطاعات جازان</div>
         </div>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(150px,1fr))',gap:'14px'}}>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))',gap:'16px'}}>
           {categoryList.map((cat,i)=>(
-            <a key={i} href={`/companies?category=${encodeURIComponent(cat.name)}`} style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:'14px',padding:'24px 14px',textAlign:'center',cursor:'pointer',textDecoration:'none',display:'block',transition:'all .2s'}}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#C8831A'; e.currentTarget.style.transform = 'translateY(-3px)'; e.currentTarget.style.boxShadow = '0 8px 20px rgba(200,131,26,0.15)' }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = '#E2E8F0'; e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
+            <a key={i} href={`/companies?category=${encodeURIComponent(cat.name)}`} style={{background:'#fff',border:'1px solid #E2E8F0',borderRadius:'16px',overflow:'hidden',cursor:'pointer',textDecoration:'none',display:'block',transition:'all .25s'}}
+              onMouseEnter={e => { e.currentTarget.style.transform = 'translateY(-4px)'; e.currentTarget.style.boxShadow = '0 12px 24px rgba(0,0,0,0.15)' }}
+              onMouseLeave={e => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.boxShadow = 'none' }}
             >
-              <div style={{fontSize:'36px',marginBottom:'10px'}}>{cat.icon}</div>
-              <div style={{fontSize:'14px',fontWeight:'700',color:'#0D3B5E'}}>{cat.name}</div>
-              <div style={{fontSize:'12px',color:'#888',marginTop:'4px'}}>{categoryCounts[cat.name] || 0} شركة</div>
+              <div style={{
+                height:'140px',
+                backgroundImage:`linear-gradient(180deg, rgba(0,0,0,0) 30%, ${cat.overlayColor} 100%), url('${cat.image}')`,
+                backgroundSize:'cover',
+                backgroundPosition:'center',
+                backgroundRepeat:'no-repeat'
+              }}></div>
+              <div style={{padding:'16px',textAlign:'center'}}>
+                <div style={{fontSize:'15px',fontWeight:'700',color:cat.color,marginBottom:'4px'}}>{cat.name}</div>
+                <div style={{fontSize:'12px',color:'#888'}}>{categoryCounts[cat.name] || 0} شركة</div>
+              </div>
             </a>
           ))}
         </div>
