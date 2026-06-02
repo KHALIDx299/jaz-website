@@ -77,10 +77,9 @@ export default function Home() {
     else window.location.href = `/${searchType}`
   }
 
-  // 🆕 القطاعات مع الصور وألوان الـ Overlay
   const categoryList = [
     {
-      name: 'الزراعة والبن',
+      name: 'الزراعة',
       image: 'https://gpnkutppljklfwzmzhag.supabase.co/storage/v1/object/public/company-logos/sustainable-coffee-farming-view-r684p8xdvph0px8wgm0thgjjhgzswddz07i9685pfk.webp',
       color: '#166534',
       overlayColor: 'rgba(22,101,52,0.75)'
@@ -98,7 +97,7 @@ export default function Home() {
       overlayColor: 'rgba(30,64,175,0.75)'
     },
     {
-      name: 'السياحة والجزر',
+      name: 'السياحة',
       image: 'https://gpnkutppljklfwzmzhag.supabase.co/storage/v1/object/public/company-logos/367320.jpeg.webp',
       color: '#9F1239',
       overlayColor: 'rgba(159,18,57,0.75)'
@@ -259,7 +258,6 @@ export default function Home() {
         ))}
       </div>
 
-      {/* 🆕 قسم القطاعات بصور حقيقية */}
       <section style={{padding:'60px 5%',background:'#F7F8FA'}}>
         <div style={{marginBottom:'36px'}}>
           <div style={{width:'44px',height:'4px',background:'#C8831A',borderRadius:'2px',marginBottom:'12px'}}></div>
