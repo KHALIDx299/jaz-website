@@ -60,8 +60,8 @@ export default function Companies() {
     const styles = {
       'الطاقة': { bg: '#FEF3C7', color: '#92400E', icon: '⚡' },
       'تقنية المعلومات': { bg: '#DBEAFE', color: '#1E40AF', icon: '💻' },
-      'الزراعة والبن': { bg: '#DCFCE7', color: '#166534', icon: '☕' },
-      'السياحة والجزر': { bg: '#FCE7F3', color: '#9F1239', icon: '🏝' },
+      'الزراعة': { bg: '#DCFCE7', color: '#166534', icon: '☕' },
+      'السياحة': { bg: '#FCE7F3', color: '#9F1239', icon: '🏝' },
       'الملاحة': { bg: '#CFFAFE', color: '#155E75', icon: '⚓' },
       'الإنشاء': { bg: '#FED7AA', color: '#9A3412', icon: '🏗' },
       'الجمعيات': { bg: '#EDE9FE', color: '#5B21B6', icon: '🤲' }
@@ -83,7 +83,7 @@ export default function Companies() {
     return colors[sum % colors.length]
   }
 
-  const categories = ['الكل', 'الطاقة', 'تقنية المعلومات', 'الزراعة والبن', 'السياحة والجزر', 'الملاحة', 'الإنشاء', 'الجمعيات']
+  const categories = ['الكل', 'الطاقة', 'تقنية المعلومات', 'الزراعة', 'السياحة', 'الملاحة', 'الإنشاء', 'الجمعيات']
 
   return (
     <main dir="rtl" style={{minHeight:'100vh', background:'#F7F8FA', fontFamily:'Arial,sans-serif'}}>
