@@ -28,6 +28,15 @@ export default function JobDetail() {
     </main>
   )
 
+  const whatsappText = encodeURIComponent(
+    '💼 وظيفة: ' + job.title + '\n' +
+    (job.company_name ? '🏢 ' + job.company_name + '\n' : '') +
+    (job.location ? '📍 ' + job.location + '\n' : '') +
+    (job.salary ? '💰 ' + job.salary + '\n' : '') +
+    (job.job_type ? '⏰ ' + job.job_type + '\n' : '') +
+    '\n🔗 https://jazguide.com/jobs/' + params.id
+  )
+
   return (
     <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', padding:'40px 20px', fontFamily:'Arial,sans-serif'}}>
       <div style={{maxWidth:'900px', margin:'0 auto'}}>
@@ -37,7 +46,33 @@ export default function JobDetail() {
           {job.job_type && <span style={{background:'#E8F5E9', color:'#2E7D32', padding:'6px 14px', borderRadius:'20px', fontSize:'13px', fontWeight:'600', display:'inline-block', marginBottom:'12px'}}>{job.job_type}</span>}
           <h1 style={{fontSize:'2rem', fontWeight:'800', color:'#1A1F2E', marginBottom:'12px', lineHeight:'1.3'}}>{job.title}</h1>
           {job.company_name && <p style={{color:'#5A6475', fontSize:'15px', marginBottom:'6px'}}>🏢 {job.company_name}</p>}
-          {job.location && <p style={{color:'#5A6475', fontSize:'15px'}}>📍 {job.location}</p>}
+          {job.location && <p style={{color:'#5A6475', fontSize:'15px', marginBottom:'0'}}>📍 {job.location}</p>}
+
+          
+            href={'https://wa.me/?text=' + whatsappText}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display:'inline-flex',
+              alignItems:'center',
+              gap:'8px',
+              backgroundColor:'#25D366',
+              color:'#fff',
+              padding:'10px 22px',
+              borderRadius:'10px',
+              textDecoration:'none',
+              fontWeight:'700',
+              fontSize:'15px',
+              marginTop:'20px',
+              boxShadow:'0 4px 12px rgba(37,211,102,0.35)'
+            }}
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.118.554 4.1 1.523 5.82L0 24l6.338-1.499A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.371l-.36-.214-3.732.882.939-3.618-.235-.374A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
+            </svg>
+            📤 شارك على واتساب
+          </a>
         </div>
 
         {job.apply_url && (
