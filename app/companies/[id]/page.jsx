@@ -3,122 +3,50 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { supabase } from '../../../lib/supabase'
 
-export default function CompanyDetail() {
+export default function JobDetail() {
   const params = useParams()
-  const [company, setCompany] = useState(null)
-  const [jobs, setJobs] = useState([])
+  const [job, setJob] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [user, setUser] = useState(null)
-  const [isOwnerOrAdmin, setIsOwnerOrAdmin] = useState(false)
 
   useEffect(() => {
-    fetchCompany()
-    checkUser()
-  }, [])
-
-  async function fetchCompany() {
-    setLoading(true)
-    const { data, error } = await supabase
-      .from('companies')
-      .select('*')
-      .eq('id', params.id)
-      .single()
-
-    if (error || !data) {
+    async function fetchJob() {
+      const { data } = await supabase.from('jobs').select('*').eq('id', params.id).single()
+      setJob(data)
       setLoading(false)
-      return
     }
+    if (params.id) fetchJob()
+  }, [params.id])
 
-    setCompany(data)
+  if (loading) return (
+    <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontFamily:'Arial,sans-serif'}}>جاري التحميل...</main>
+  )
 
-    const { data: jobsData } = await supabase
-      .from('jobs')
-      .select('*')
-      .eq('company_name', data.name)
-      .order('created_at', { ascending: false })
-
-    setJobs(jobsData || [])
-    setLoading(false)
-  }
-
-  async function checkUser() {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) setUser(user)
-  }
-
-  useEffect(() => {
-    async function checkOwnership() {
-      if (!user || !company) return
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-
-      const isAdmin = profile?.role === 'admin'
-      const isOwner = company.user_id === user.id
-      setIsOwnerOrAdmin(isAdmin || isOwner)
-    }
-    checkOwnership()
-  }, [user, company])
-
-  if (loading) {
-    return (
-      <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontSize:'18px'}}>
-        جاري التحميل...
-      </main>
-    )
-  }
-
-  if (!company) {
-    return (
-      <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', color:'white'}}>
-        <h1 style={{fontSize:'2rem', marginBottom:'1rem'}}>الشركة غير موجودة 😔</h1>
-        <a href="/companies" style={{color:'#F5A623', textDecoration:'none', fontSize:'16px'}}>← رجوع لقائمة الشركات</a>
-      </main>
-    )
-  }
+  if (!job) return (
+    <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', color:'white', fontFamily:'Arial,sans-serif'}}>
+      <h1>الوظيفة غير موجودة 😔</h1>
+      <a href="/jobs" style={{color:'#F5A623', textDecoration:'none', marginTop:'1rem'}}>← رجوع لقائمة الوظائف</a>
+    </main>
+  )
 
   const whatsappText = encodeURIComponent(
-    '🏢 ' + company.name + '\n' +
-    (company.category ? '🏷️ ' + company.category + '\n' : '') +
-    (company.location ? '📍 ' + company.location + '\n' : '') +
-    (company.description ? '\n' + company.description.slice(0, 120) + '...\n' : '') +
-    '\n🔗 https://jazguide.com/companies/' + params.id
+    '💼 وظيفة: ' + job.title + '\n' +
+    (job.company_name ? '🏢 ' + job.company_name + '\n' : '') +
+    (job.location ? '📍 ' + job.location + '\n' : '') +
+    (job.salary ? '💰 ' + job.salary + '\n' : '') +
+    (job.job_type ? '⏰ ' + job.job_type + '\n' : '') +
+    '\n🔗 https://jazguide.com/jobs/' + params.id
   )
 
   return (
-    <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', padding:'40px 20px'}}>
+    <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', padding:'40px 20px', fontFamily:'Arial,sans-serif'}}>
       <div style={{maxWidth:'900px', margin:'0 auto'}}>
-
-        <a href="/companies" style={{color:'#F5A623', fontSize:'14px', textDecoration:'none', display:'inline-block', marginBottom:'24px'}}>
-          ← رجوع لقائمة الشركات
-        </a>
+        <a href="/jobs" style={{color:'#F5A623', fontSize:'14px', textDecoration:'none', display:'inline-block', marginBottom:'24px'}}>← رجوع لقائمة الوظائف</a>
 
         <div style={{background:'#fff', borderRadius:'16px', padding:'32px', marginBottom:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
-          <div style={{display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:'16px'}}>
-            <div style={{flex:1, minWidth:'250px'}}>
-              {company.category && (
-                <span style={{background:'#E8F5E9', color:'#2E7D32', padding:'6px 14px', borderRadius:'20px', fontSize:'13px', fontWeight:'600', display:'inline-block', marginBottom:'12px'}}>
-                  {company.category}
-                </span>
-              )}
-              <h1 style={{fontSize:'2rem', fontWeight:'800', color:'#1A1F2E', marginBottom:'12px', lineHeight:'1.3'}}>
-                {company.name}
-              </h1>
-              {company.location && (
-                <p style={{color:'#5A6475', fontSize:'15px'}}>
-                  📍 {company.location}
-                </p>
-              )}
-            </div>
-
-            {isOwnerOrAdmin && (
-              <a href="/dashboard" style={{background:'#0D3B5E', color:'#fff', padding:'10px 20px', borderRadius:'8px', fontSize:'14px', fontWeight:'700', textDecoration:'none'}}>
-                ✏️ تعديل
-              </a>
-            )}
-          </div>
+          {job.job_type && <span style={{background:'#E8F5E9', color:'#2E7D32', padding:'6px 14px', borderRadius:'20px', fontSize:'13px', fontWeight:'600', display:'inline-block', marginBottom:'12px'}}>{job.job_type}</span>}
+          <h1 style={{fontSize:'2rem', fontWeight:'800', color:'#1A1F2E', marginBottom:'12px', lineHeight:'1.3'}}>{job.title}</h1>
+          {job.company_name && <p style={{color:'#5A6475', fontSize:'15px', marginBottom:'6px'}}>🏢 {job.company_name}</p>}
+          {job.location && <p style={{color:'#5A6475', fontSize:'15px', marginBottom:'0'}}>📍 {job.location}</p>}
 
           
             href={'https://wa.me/?text=' + whatsappText}
@@ -143,61 +71,65 @@ export default function CompanyDetail() {
           </a>
         </div>
 
-        {company.description && (
-          <div style={{background:'#fff', borderRadius:'16px', padding:'28px', marginBottom:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
-            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'16px', display:'flex', alignItems:'center', gap:'8px'}}>
-              📝 عن الشركة
-            </h2>
-            <p style={{color:'#5A6475', fontSize:'15px', lineHeight:'1.9'}}>
-              {company.description}
-            </p>
-          </div>
+        {job.apply_url && (
+          <a href={job.apply_url} target="_blank" rel="noopener noreferrer" style={{display:'block', background:'linear-gradient(135deg, #F5A623, #C8831A)', color:'#fff', padding:'20px', borderRadius:'16px', textDecoration:'none', marginBottom:'20px', textAlign:'center', boxShadow:'0 6px 20px rgba(245,166,35,0.4)'}}>
+            <div style={{fontSize:'1.2rem', fontWeight:'800', marginBottom:'4px'}}>🚀 قدّم الآن على المنصة</div>
+            <div style={{fontSize:'13px', opacity:0.9}}>اضغط للانتقال لرابط التقديم في مصدر الوظيفة</div>
+          </a>
         )}
 
-        {(company.phone || company.email || company.website) && (
-          <div style={{background:'#fff', borderRadius:'16px', padding:'28px', marginBottom:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
-            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'20px', display:'flex', alignItems:'center', gap:'8px'}}>
-              📞 معلومات التواصل
-            </h2>
-            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:'14px'}}>
-              {company.phone && (
-                <a href={'tel:' + company.phone} style={{background:'#F7F8FA', padding:'16px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block'}}>
-                  <div style={{fontSize:'12px', color:'#888', marginBottom:'4px'}}>📞 الهاتف</div>
-                  <div style={{color:'#0D3B5E', fontWeight:'700', fontSize:'15px'}}>{company.phone}</div>
-                </a>
-              )}
-              {company.email && (
-                <a href={'mailto:' + company.email} style={{background:'#F7F8FA', padding:'16px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block'}}>
-                  <div style={{fontSize:'12px', color:'#888', marginBottom:'4px'}}>✉️ البريد الإلكتروني</div>
-                  <div style={{color:'#0D3B5E', fontWeight:'700', fontSize:'15px', wordBreak:'break-all'}}>{company.email}</div>
-                </a>
-              )}
-              {company.website && (
-                <a href={company.website} target="_blank" rel="noopener noreferrer" style={{background:'#F7F8FA', padding:'16px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block'}}>
-                  <div style={{fontSize:'12px', color:'#888', marginBottom:'4px'}}>🌐 الموقع الإلكتروني</div>
-                  <div style={{color:'#0D3B5E', fontWeight:'700', fontSize:'15px', wordBreak:'break-all'}}>{company.website}</div>
-                </a>
-              )}
+        <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:'14px', marginBottom:'20px'}}>
+          {job.salary && (
+            <div style={{background:'#fff', borderRadius:'16px', padding:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
+              <div style={{fontSize:'12px', color:'#888', marginBottom:'6px'}}>💰 الراتب</div>
+              <div style={{color:'#0D3B5E', fontWeight:'700', fontSize:'17px'}}>{job.salary}</div>
             </div>
+          )}
+          {job.job_type && (
+            <div style={{background:'#fff', borderRadius:'16px', padding:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
+              <div style={{fontSize:'12px', color:'#888', marginBottom:'6px'}}>⏰ نوع الدوام</div>
+              <div style={{color:'#0D3B5E', fontWeight:'700', fontSize:'17px'}}>{job.job_type}</div>
+            </div>
+          )}
+        </div>
+
+        {job.description && (
+          <div style={{background:'#fff', borderRadius:'16px', padding:'28px', marginBottom:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
+            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'16px'}}>📝 وصف الوظيفة</h2>
+            <p style={{color:'#5A6475', fontSize:'15px', lineHeight:'1.9', whiteSpace:'pre-line'}}>{job.description}</p>
           </div>
         )}
 
-        {jobs.length > 0 && (
+        {job.requirements && (
           <div style={{background:'#fff', borderRadius:'16px', padding:'28px', marginBottom:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
-            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'20px', display:'flex', alignItems:'center', gap:'8px'}}>
-              💼 الوظائف المتاحة ({jobs.length})
-            </h2>
-            <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
-              {jobs.map(job => (
-                <a key={job.id} href={'/jobs/' + job.id} style={{background:'#F7F8FA', padding:'18px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block'}}>
-                  <h3 style={{color:'#1A1F2E', fontSize:'16px', fontWeight:'700', marginBottom:'8px'}}>{job.title}</h3>
-                  <div style={{display:'flex', gap:'16px', flexWrap:'wrap', fontSize:'13px', color:'#5A6475'}}>
-                    {job.job_type && <span>🏢 {job.job_type}</span>}
-                    {job.location && <span>📍 {job.location}</span>}
-                    {job.salary && <span>💰 {job.salary}</span>}
-                  </div>
+            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'16px'}}>✅ الشروط والمتطلبات</h2>
+            <p style={{color:'#5A6475', fontSize:'15px', lineHeight:'1.9', whiteSpace:'pre-line'}}>{job.requirements}</p>
+          </div>
+        )}
+
+        {job.company_details && (
+          <div style={{background:'#fff', borderRadius:'16px', padding:'28px', marginBottom:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
+            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'16px'}}>🏢 عن الشركة</h2>
+            <p style={{color:'#5A6475', fontSize:'15px', lineHeight:'1.9', whiteSpace:'pre-line'}}>{job.company_details}</p>
+          </div>
+        )}
+
+        {(job.phone || job.email) && (
+          <div style={{background:'#fff', borderRadius:'16px', padding:'28px', marginBottom:'20px', boxShadow:'0 4px 12px rgba(0,0,0,0.1)'}}>
+            <h2 style={{fontSize:'1.3rem', fontWeight:'700', color:'#1A1F2E', marginBottom:'20px'}}>📞 للتقديم والتواصل</h2>
+            <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:'14px'}}>
+              {job.phone && (
+                <a href={'tel:' + job.phone} style={{background:'#F7F8FA', padding:'16px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block'}}>
+                  <div style={{fontSize:'12px', color:'#888', marginBottom:'4px'}}>📞 الهاتف</div>
+                  <div style={{color:'#0D3B5E', fontWeight:'700', fontSize:'15px'}}>{job.phone}</div>
                 </a>
-              ))}
+              )}
+              {job.email && (
+                <a href={'mailto:' + job.email} style={{background:'#F7F8FA', padding:'16px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block'}}>
+                  <div style={{fontSize:'12px', color:'#888', marginBottom:'4px'}}>✉️ البريد الإلكتروني</div>
+                  <div style={{color:'#0D3B5E', fontWeight:'700', fontSize:'15px', wordBreak:'break-all'}}>{job.email}</div>
+                </a>
+              )}
             </div>
           </div>
         )}
