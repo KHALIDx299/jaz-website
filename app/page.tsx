@@ -249,7 +249,7 @@ export default function Home() {
           {num:`+${totalCompanies}`,label:'شركة مسجّلة'},
           {num:`${Object.keys(categoryCounts).length}`,label:'قطاعاً اقتصادياً'},
           {num:`+${totalJobs}`,label:'وظيفة متاحة'},
-          {num:'٩٨٪',label:'رضا المستخدمين'}
+          {num:'98%',label:'رضا المستخدمين'}
         ].map((s,i)=>(
           <div key={i} style={{padding:'24px 16px',textAlign:'center',borderLeft:i<3?'1px solid #E2E8F0':'none'}}>
             <div style={{fontSize:'clamp(22px,4vw,32px)',fontWeight:'800',color:'#0D3B5E'}}>{s.num}</div>
