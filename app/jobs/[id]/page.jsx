@@ -28,14 +28,14 @@ export default function JobDetail() {
     </main>
   )
 
-  const whatsappText = encodeURIComponent(
-    '💼 وظيفة: ' + job.title + '\n' +
+  const shareText = '💼 وظيفة: ' + job.title + '\n' +
     (job.company_name ? '🏢 ' + job.company_name + '\n' : '') +
     (job.location ? '📍 ' + job.location + '\n' : '') +
     (job.salary ? '💰 ' + job.salary + '\n' : '') +
     (job.job_type ? '⏰ ' + job.job_type + '\n' : '') +
     '\n🔗 https://jazguide.com/jobs/' + params.id
-  )
+
+  const whatsappUrl = 'https://wa.me/?text=' + encodeURIComponent(shareText)
 
   return (
     <main dir="rtl" style={{minHeight:'100vh', background:'linear-gradient(135deg, #0D3B2E 0%, #1a5c45 100%)', padding:'40px 20px', fontFamily:'Arial,sans-serif'}}>
@@ -48,25 +48,7 @@ export default function JobDetail() {
           {job.company_name && <p style={{color:'#5A6475', fontSize:'15px', marginBottom:'6px'}}>🏢 {job.company_name}</p>}
           {job.location && <p style={{color:'#5A6475', fontSize:'15px', marginBottom:'0'}}>📍 {job.location}</p>}
 
-          
-            href={'https://wa.me/?text=' + whatsappText}
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{
-              display:'inline-flex',
-              alignItems:'center',
-              gap:'8px',
-              backgroundColor:'#25D366',
-              color:'#fff',
-              padding:'10px 22px',
-              borderRadius:'10px',
-              textDecoration:'none',
-              fontWeight:'700',
-              fontSize:'15px',
-              marginTop:'20px',
-              boxShadow:'0 4px 12px rgba(37,211,102,0.35)'
-            }}
-          >
+          <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" style={{display:'inline-flex', alignItems:'center', gap:'8px', backgroundColor:'#25D366', color:'#fff', padding:'12px 24px', borderRadius:'10px', textDecoration:'none', fontWeight:'700', fontSize:'15px', marginTop:'20px', boxShadow:'0 4px 12px rgba(37,211,102,0.35)'}}>
             📤 شارك على واتساب
           </a>
         </div>
