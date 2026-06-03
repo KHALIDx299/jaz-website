@@ -120,7 +120,6 @@ export default function CompanyDetail() {
             )}
           </div>
 
-          {/* زر مشاركة واتساب */}
           
             href={'https://wa.me/?text=' + whatsappText}
             target="_blank"
@@ -140,10 +139,6 @@ export default function CompanyDetail() {
               boxShadow:'0 4px 12px rgba(37,211,102,0.35)'
             }}
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.118.554 4.1 1.523 5.82L0 24l6.338-1.499A11.946 11.946 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.818 9.818 0 01-5.006-1.371l-.36-.214-3.732.882.939-3.618-.235-.374A9.818 9.818 0 012.182 12C2.182 6.57 6.57 2.182 12 2.182S21.818 6.57 21.818 12 17.43 21.818 12 21.818z"/>
-            </svg>
             📤 شارك على واتساب
           </a>
         </div>
@@ -166,13 +161,13 @@ export default function CompanyDetail() {
             </h2>
             <div style={{display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(220px, 1fr))', gap:'14px'}}>
               {company.phone && (
-                <a href={`tel:${company.phone}`} style={{background:'#F7F8FA', padding:'16px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block'}}>
+                <a href={'tel:' + company.phone} style={{background:'#F7F8FA', padding:'16px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block'}}>
                   <div style={{fontSize:'12px', color:'#888', marginBottom:'4px'}}>📞 الهاتف</div>
                   <div style={{color:'#0D3B5E', fontWeight:'700', fontSize:'15px'}}>{company.phone}</div>
                 </a>
               )}
               {company.email && (
-                <a href={`mailto:${company.email}`} style={{background:'#F7F8FA', padding:'16px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block'}}>
+                <a href={'mailto:' + company.email} style={{background:'#F7F8FA', padding:'16px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block'}}>
                   <div style={{fontSize:'12px', color:'#888', marginBottom:'4px'}}>✉️ البريد الإلكتروني</div>
                   <div style={{color:'#0D3B5E', fontWeight:'700', fontSize:'15px', wordBreak:'break-all'}}>{company.email}</div>
                 </a>
@@ -194,7 +189,7 @@ export default function CompanyDetail() {
             </h2>
             <div style={{display:'flex', flexDirection:'column', gap:'12px'}}>
               {jobs.map(job => (
-                <a key={job.id} href={'/jobs/' + job.id} style={{background:'#F7F8FA', padding:'18px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block', transition:'all .2s'}}>
+                <a key={job.id} href={'/jobs/' + job.id} style={{background:'#F7F8FA', padding:'18px', borderRadius:'12px', textDecoration:'none', border:'1px solid #E2E8F0', display:'block'}}>
                   <h3 style={{color:'#1A1F2E', fontSize:'16px', fontWeight:'700', marginBottom:'8px'}}>{job.title}</h3>
                   <div style={{display:'flex', gap:'16px', flexWrap:'wrap', fontSize:'13px', color:'#5A6475'}}>
                     {job.job_type && <span>🏢 {job.job_type}</span>}
