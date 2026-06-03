@@ -110,7 +110,7 @@ export default function Companies() {
           {categories.map(cat => {
             const isActive = selectedCategory === cat
             const style = cat !== 'الكل' ? getCategoryStyle(cat) : null
-            const label = cat !== 'الكل' && style ? style.icon + ' ' + cat : '🏢 ' + cat
+const label = cat
             return (
               <button key={cat} onClick={() => setSelectedCategory(cat)} style={{padding:'10px 18px', borderRadius:'24px', border: isActive ? '2px solid #0D3B5E' : '1px solid #E2E8F0', background: isActive ? '#0D3B5E' : '#fff', color: isActive ? '#fff' : '#0D3B5E', fontSize:'13px', fontWeight:'700', cursor:'pointer', fontFamily:'Arial,sans-serif'}}>
                 {label}
