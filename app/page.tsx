@@ -290,8 +290,8 @@ export default function Home() {
         <h2 style={{fontSize:'clamp(22px,5vw,38px)',fontWeight:'800',color:'#fff',marginBottom:'12px'}}>ابدأ رحلتك مع JAZ اليوم</h2>
         <p style={{color:'rgba(255,255,255,.7)',fontSize:'17px',marginBottom:'36px'}}>سجّل شركتك أو اكتشف وظيفة أحلامك في جازان</p>
         <div style={{display:'flex',gap:'14px',justifyContent:'center',flexWrap:'wrap'}}>
-          <a href="/add-company" style={{background:'#C8831A',color:'#fff',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>🏢 سجّل شركتك مجاناً</a>
-          <a href="/jobs" style={{background:'transparent',color:'#fff',border:'2px solid rgba(255,255,255,.4)',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>💼 استعرض الوظائف</a>
+          <a href="/add-company" style={{background:'#C8831A',color:'#fff',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>سجّل شركتك مجاناً</a>
+          <a href="/jobs" style={{background:'transparent',color:'#fff',border:'2px solid rgba(255,255,255,.4)',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>استعرض الوظائف</a>
         </div>
       </section>
 
