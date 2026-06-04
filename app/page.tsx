@@ -193,24 +193,24 @@ export default function Home() {
         className={`mobile-menu ${menuOpen ? 'open' : ''}`}
         style={{display:'none',background:'#fff',borderBottom:'1px solid #E2E8F0',padding:'12px 5%',position:'sticky',top:'80px',zIndex:99}}
       >
-        <a href="/companies" style={navLinkStyle}>🏢 الشركات</a>
-        <a href="/jobs" style={navLinkStyle}>💼 الوظائف</a>
-        <a href="/about" style={navLinkStyle}>ℹ️ من نحن</a>
-        <a href="/contact" style={navLinkStyle}>📞 تواصل معنا</a>
+        <a href="/companies" style={navLinkStyle}>الشركات</a>
+        <a href="/jobs" style={navLinkStyle}>الوظائف</a>
+        <a href="/about" style={navLinkStyle}>من نحن</a>
+        <a href="/contact" style={navLinkStyle}>تواصل معنا</a>
         {!user ? (
           <>
-            <a href="/login" style={navLinkStyle}>🔑 تسجيل دخول</a>
-            <a href="/add-company" style={{...navLinkStyle, background:'#0D3B5E', color:'#fff', borderRadius:'8px', textAlign:'center' as const, marginTop:'8px'}}>➕ سجّل شركتك</a>
+            <a href="/login" style={navLinkStyle}>تسجيل دخول</a>
+            <a href="/add-company" style={{...navLinkStyle, background:'#0D3B5E', color:'#fff', borderRadius:'8px', textAlign:'center' as const, marginTop:'8px'}}>سجل شركتك</a>
           </>
         ) : role === 'admin' ? (
           <>
             <a href="/admin" style={{...navLinkStyle, background:'#C8831A', color:'#fff', borderRadius:'8px', textAlign:'center' as const, marginTop:'8px'}}>👑 لوحة الأدمن</a>
-            <button onClick={handleLogout} style={{...navLinkStyle, background:'transparent', border:'1px solid #E2E8F0', borderRadius:'8px', width:'100%', textAlign:'center' as const, marginTop:'8px', cursor:'pointer', fontFamily:'Arial,sans-serif'}}>🚪 خروج</button>
+            <button onClick={handleLogout} style={{...navLinkStyle, background:'transparent', border:'1px solid #E2E8F0', borderRadius:'8px', width:'100%', textAlign:'center' as const, marginTop:'8px', cursor:'pointer', fontFamily:'Arial,sans-serif'}}>خروج</button>
           </>
         ) : (
           <>
-            <a href="/dashboard" style={{...navLinkStyle, background:'#0D3B5E', color:'#fff', borderRadius:'8px', textAlign:'center' as const, marginTop:'8px'}}>👤 حسابي</a>
-            <button onClick={handleLogout} style={{...navLinkStyle, background:'transparent', border:'1px solid #E2E8F0', borderRadius:'8px', width:'100%', textAlign:'center' as const, marginTop:'8px', cursor:'pointer', fontFamily:'Arial,sans-serif'}}>🚪 خروج</button>
+            <a href="/dashboard" style={{...navLinkStyle, background:'#0D3B5E', color:'#fff', borderRadius:'8px', textAlign:'center' as const, marginTop:'8px'}}>حسابي</a>
+            <button onClick={handleLogout} style={{...navLinkStyle, background:'transparent', border:'1px solid #E2E8F0', borderRadius:'8px', width:'100%', textAlign:'center' as const, marginTop:'8px', cursor:'pointer', fontFamily:'Arial,sans-serif'}}>خروج</button>
           </>
         )}
       </div>
