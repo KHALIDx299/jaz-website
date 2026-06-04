@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   metadataBase: new URL('https://jazguide.com'),
   title: "JAZ | دليل الأعمال والوظائف في جازان",
   description: "منصتك الذكية للعثور على الشركات والوظائف والفرص في جازان",
+  verification: {
+    google: '0Q-4kFyKqM3tthWAWtoryL7KXVOLPBueKt3gLtMg4Tw',
+  },
   icons: {
     icon: '/icon.svg',
   },
