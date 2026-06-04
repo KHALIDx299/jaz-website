@@ -178,7 +178,7 @@ function CompanyCard({ company, index, getCategoryStyle, getLogoColor, getInitia
 
       {company.category && (
         <div style={{display:'inline-block', background: catStyle.bg, color: catStyle.color, padding:'5px 12px', borderRadius:'14px', fontSize:'12px', fontWeight:'600', marginBottom:'12px'}}>
-          {catStyle.icon} {company.category}
+          {company.category}
         </div>
       )}
 
