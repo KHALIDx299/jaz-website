@@ -15,6 +15,7 @@ export default function SeekersPage() {
   const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState('')
+  const [fieldErrors, setFieldErrors] = useState({})
 
   const specializations = [
     'إدارة أعمال',
@@ -46,8 +47,45 @@ export default function SeekersPage() {
     'أكثر من 10 سنوات',
   ]
 
+  function validateField(name, value) {
+    let err = ''
+
+    if (name === 'full_name') {
+      if (!value.trim()) err = 'الاسم مطلوب'
+      else if (value.trim().length < 5) err = 'الاسم قصير جداً (5 حروف على الأقل)'
+      else if (!value.trim().includes(' ')) err = 'اكتب الاسم الكامل (اسم أول + عائلة)'
+      else if (/\d/.test(value)) err = 'الاسم لا يحتوي على أرقام'
+    }
+
+    if (name === 'phone') {
+      const cleaned = value.replace(/\s/g, '')
+      if (!cleaned) err = 'رقم الجوال مطلوب'
+      else if (!/^\d+$/.test(cleaned)) err = 'الرقم يحتوي أرقام فقط'
+      else if (!cleaned.startsWith('05')) err = 'الرقم يبدأ بـ 05'
+      else if (cleaned.length !== 10) err = 'الرقم يجب أن يكون 10 أرقام'
+    }
+
+    if (name === 'email') {
+      if (!value.trim()) err = 'الإيميل مطلوب'
+      else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) err = 'صيغة الإيميل غير صحيحة'
+    }
+
+    if (name === 'linkedin_url' && value.trim()) {
+      if (!value.includes('linkedin.com')) err = 'رابط لينكدإن غير صحيح'
+    }
+
+    if (name === 'specialization' && !value) err = 'اختر التخصص'
+    if (name === 'experience_years' && !value) err = 'اختر مستوى الخبرة'
+
+    return err
+  }
+
   function handleChange(e) {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+
+    const err = validateField(name, value)
+    setFieldErrors({ ...fieldErrors, [name]: err })
   }
 
   function handleFileChange(e) {
@@ -56,6 +94,11 @@ export default function SeekersPage() {
 
     if (file.size > 5 * 1024 * 1024) {
       setError('❌ حجم الملف كبير جداً (الحد الأقصى 5 ميجا)')
+      return
+    }
+
+    if (file.size < 1024) {
+      setError('❌ الملف صغير جداً، تأكد إنه يحتوي على محتوى')
       return
     }
 
@@ -73,8 +116,23 @@ export default function SeekersPage() {
     e.preventDefault()
     setError('')
 
+    // التحقق من كل الخانات
+    const errors = {}
+    Object.keys(formData).forEach(key => {
+      const err = validateField(key, formData[key])
+      if (err) errors[key] = err
+    })
+
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors)
+      setError('❌ من فضلك صحّح الأخطاء في النموذج')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return
+    }
+
     if (!cvFile) {
       setError('❌ من فضلك ارفع السيرة الذاتية')
+      window.scrollTo({ top: 0, behavior: 'smooth' })
       return
     }
 
@@ -144,7 +202,7 @@ export default function SeekersPage() {
       <div style={{ background: 'linear-gradient(135deg, #0D3B5E 0%, #1A5C30 100%)', padding: '50px 5%', color: '#fff', textAlign: 'center' }}>
         <a href="/" style={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px', textDecoration: 'none', display: 'inline-block', marginBottom: '20px' }}>← الرجوع للرئيسية</a>
         <h1 style={{ fontSize: 'clamp(24px, 4vw, 36px)', fontWeight: '800', margin: '0 0 12px', lineHeight: '1.3' }}>
-          👤 سجّل سيرتك الذاتية
+          👤 باحث عن عمل
         </h1>
         <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '16px', margin: 0, maxWidth: '600px', marginLeft: 'auto', marginRight: 'auto' }}>
           انضم لقاعدة بيانات الباحثين عن عمل في جازان، وسنشاركك مع الشركات وشركاء التوظيف
@@ -152,7 +210,7 @@ export default function SeekersPage() {
       </div>
 
       <div style={{ maxWidth: '700px', margin: '0 auto', padding: '40px 5%' }}>
-        <form onSubmit={handleSubmit} style={{ background: '#fff', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
+        <form onSubmit={handleSubmit} noValidate style={{ background: '#fff', borderRadius: '16px', padding: '32px', boxShadow: '0 4px 20px rgba(0,0,0,0.08)' }}>
 
           {error && (
             <div style={{ background: '#FEF2F2', color: '#991B1B', padding: '12px 16px', borderRadius: '10px', marginBottom: '20px', fontSize: '14px', border: '1px solid #FECACA' }}>
@@ -162,38 +220,75 @@ export default function SeekersPage() {
 
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>الاسم الكامل *</label>
-            <input type="text" name="full_name" value={formData.full_name} onChange={handleChange} required style={inputStyle} placeholder="اكتب اسمك الكامل" />
+            <input
+              type="text"
+              name="full_name"
+              value={formData.full_name}
+              onChange={handleChange}
+              style={getInputStyle(fieldErrors.full_name)}
+              placeholder="مثال: خالد محمد العتيبي"
+            />
+            {fieldErrors.full_name && <div style={errorStyle}>⚠️ {fieldErrors.full_name}</div>}
           </div>
 
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>التخصص *</label>
-            <select name="specialization" value={formData.specialization} onChange={handleChange} required style={inputStyle}>
+            <select name="specialization" value={formData.specialization} onChange={handleChange} style={getInputStyle(fieldErrors.specialization)}>
               <option value="">-- اختر التخصص --</option>
               {specializations.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
+            {fieldErrors.specialization && <div style={errorStyle}>⚠️ {fieldErrors.specialization}</div>}
           </div>
 
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>سنوات الخبرة *</label>
-            <select name="experience_years" value={formData.experience_years} onChange={handleChange} required style={inputStyle}>
+            <select name="experience_years" value={formData.experience_years} onChange={handleChange} style={getInputStyle(fieldErrors.experience_years)}>
               <option value="">-- اختر مستوى الخبرة --</option>
               {experienceLevels.map(e => <option key={e} value={e}>{e}</option>)}
             </select>
+            {fieldErrors.experience_years && <div style={errorStyle}>⚠️ {fieldErrors.experience_years}</div>}
           </div>
 
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>رقم الجوال *</label>
-            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required style={inputStyle} placeholder="05xxxxxxxx" />
+            <input
+              type="tel"
+              name="phone"
+              value={formData.phone}
+              onChange={handleChange}
+              maxLength="10"
+              style={getInputStyle(fieldErrors.phone)}
+              placeholder="05xxxxxxxx"
+            />
+            {fieldErrors.phone && <div style={errorStyle}>⚠️ {fieldErrors.phone}</div>}
+            <div style={hintStyle}>📌 يبدأ بـ 05 ويتكون من 10 أرقام</div>
           </div>
 
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>البريد الإلكتروني *</label>
-            <input type="email" name="email" value={formData.email} onChange={handleChange} required style={inputStyle} placeholder="example@email.com" />
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              style={getInputStyle(fieldErrors.email)}
+              placeholder="example@email.com"
+            />
+            {fieldErrors.email && <div style={errorStyle}>⚠️ {fieldErrors.email}</div>}
           </div>
 
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>رابط لينكدإن (اختياري)</label>
-            <input type="url" name="linkedin_url" value={formData.linkedin_url} onChange={handleChange} style={inputStyle} placeholder="https://linkedin.com/in/..." />
+            <input
+              type="url"
+              name="linkedin_url"
+              value={formData.linkedin_url}
+              onChange={handleChange}
+              style={getInputStyle(fieldErrors.linkedin_url)}
+              placeholder="https://linkedin.com/in/your-name"
+            />
+            {fieldErrors.linkedin_url && <div style={errorStyle}>⚠️ {fieldErrors.linkedin_url}</div>}
+            <div style={hintStyle}>📌 يحتوي على linkedin.com</div>
           </div>
 
           <div style={{ marginBottom: '24px' }}>
@@ -241,14 +336,33 @@ const labelStyle = {
   fontWeight: '700',
 }
 
-const inputStyle = {
+const baseInputStyle = {
   width: '100%',
   padding: '12px 16px',
-  border: '1px solid #E2E8F0',
   borderRadius: '10px',
   fontSize: '14px',
   outline: 'none',
   fontFamily: 'Arial,sans-serif',
   direction: 'rtl',
   background: '#fff',
+}
+
+function getInputStyle(hasError) {
+  return {
+    ...baseInputStyle,
+    border: hasError ? '2px solid #DC2626' : '1px solid #E2E8F0',
+  }
+}
+
+const errorStyle = {
+  color: '#DC2626',
+  fontSize: '12px',
+  marginTop: '6px',
+  fontWeight: '600',
+}
+
+const hintStyle = {
+  color: '#888',
+  fontSize: '11px',
+  marginTop: '4px',
 }
