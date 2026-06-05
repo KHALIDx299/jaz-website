@@ -158,7 +158,7 @@ export default function Home() {
         <div className="desktop-nav">
           <a href="/companies" style={navLinkStyle}>الشركات</a>
           <a href="/jobs" style={navLinkStyle}>الوظائف</a>
-          <a href="/seekers" style={navLinkStyle}>سجّل سيرتك</a>
+          <a href="/seekers" style={navLinkStyle}>باحث عن عمل</a>
           <a href="/about" style={navLinkStyle}>من نحن</a>
 
           {loadingUser ? (
@@ -196,7 +196,7 @@ export default function Home() {
       >
         <a href="/companies" style={navLinkStyle}>الشركات</a>
         <a href="/jobs" style={navLinkStyle}>الوظائف</a>
-        <a href="/seekers" style={navLinkStyle}>سجّل سيرتك</a>
+        <a href="/seekers" style={navLinkStyle}>باحث عن عمل</a>
         <a href="/about" style={navLinkStyle}>من نحن</a>
         <a href="/contact" style={navLinkStyle}>تواصل معنا</a>
         {!user ? (
@@ -294,7 +294,7 @@ export default function Home() {
         <div style={{display:'flex',gap:'14px',justifyContent:'center',flexWrap:'wrap'}}>
           <a href="/add-company" style={{background:'#C8831A',color:'#fff',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>سجّل شركتك مجاناً</a>
           <a href="/jobs" style={{background:'transparent',color:'#fff',border:'2px solid rgba(255,255,255,.4)',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>استعرض الوظائف</a>
-          <a href="/seekers" style={{background:'#1A5C30',color:'#fff',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>سجّل سيرتك الذاتية</a>
+          <a href="/seekers" style={{background:'#1A5C30',color:'#fff',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>باحث عن عمل</a>
         </div>
       </section>
 
@@ -325,7 +325,7 @@ export default function Home() {
             <div style={{color:'#F5A623',fontSize:'14px',fontWeight:'700',marginBottom:'14px'}}>روابط سريعة</div>
             <a href="/companies" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الشركات</a>
             <a href="/jobs" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>الوظائف</a>
-            <a href="/seekers" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>سجّل سيرتك</a>
+            <a href="/seekers" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px',marginBottom:'8px'}}>باحث عن عمل</a>
             <a href="/add-company" style={{display:'block',color:'rgba(255,255,255,.7)',textDecoration:'none',fontSize:'13px'}}>سجّل شركتك</a>
           </div>
 
