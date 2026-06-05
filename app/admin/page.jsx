@@ -90,7 +90,6 @@ export default function AdminPage() {
     setActionLoading(null)
   }
 
-  // 🆕 رفع شعار من لوحة الأدمن لأي شركة
   const handleLogoUpload = async (event, companyId, companyName) => {
     const file = event.target.files?.[0]
     if (!file) return
@@ -141,7 +140,6 @@ export default function AdminPage() {
     }
   }
 
-  // 🆕 حذف الشعار
   const handleRemoveLogo = async (companyId, companyName) => {
     if (!confirm(`هل تريد حذف شعار "${companyName}"؟`)) return
 
@@ -202,6 +200,7 @@ export default function AdminPage() {
             <p style={{ color: '#a0aec0', margin: '0.3rem 0 0 0' }}>{profile?.full_name} • {user?.email}</p>
           </div>
           <div style={{ display: 'flex', gap: '0.7rem', flexWrap: 'wrap' }}>
+            <Link href="/admin/seekers" style={{...btnSecondary, background:'linear-gradient(135deg, #22c55e, #16a34a)', border:'none', fontWeight:'bold'}}>👤 الباحثون عن عمل</Link>
             <Link href="/" style={btnSecondary}>الرئيسية</Link>
             <Link href="/dashboard" style={btnSecondary}>حسابي</Link>
             <button onClick={handleLogout} style={btnDanger}>خروج</button>
@@ -251,10 +250,8 @@ export default function AdminPage() {
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
 
-                    {/* 🆕 الشعار + معلومات الشركة */}
                     <div style={{ flex: 1, minWidth: '200px', display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
 
-                      {/* صورة الشعار */}
                       <div style={{
                         width: '72px',
                         height: '72px',
@@ -296,7 +293,6 @@ export default function AdminPage() {
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
 
-                      {/* 🆕 زر رفع/تغيير الشعار */}
                       <label style={{ ...btnLogo, opacity: uploadingId === company.id ? 0.6 : 1, cursor: uploadingId === company.id ? 'not-allowed' : 'pointer' }}>
                         {uploadingId === company.id ? '⏳ جاري الرفع...' : (company.logo_url ? '🔄 تغيير الشعار' : '🖼️ رفع شعار')}
                         <input
