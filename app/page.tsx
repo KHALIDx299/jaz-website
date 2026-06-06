@@ -293,7 +293,7 @@ export default function Home() {
         <p style={{color:'rgba(255,255,255,.7)',fontSize:'17px',marginBottom:'36px'}}>سجّل شركتك أو اكتشف وظيفة أحلامك في جازان</p>
         <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap'}}>
           <a href="/add-company" style={{background:'transparent',color:'#fff',border:'2px solid rgba(255,255,255,.4)',textDecoration:'none',padding:'10px 22px',borderRadius:'10px',fontSize:'14px',fontWeight:'700'}}>سجّل شركتك</a>
-          <a href="/seekers" style={{background:'#C8831A',color:'#fff',border:'2px solid #C8831A',textDecoration:'none',padding:'10px 22px',borderRadius:'10px',fontSize:'14px',fontWeight:'700'}}>باحث عن عمل</a>
+          <a href="/seekers" style={{background:'transparent',color:'#fff',border:'2px solid rgba(255,255,255,.4)',textDecoration:'none',padding:'10px 22px',borderRadius:'10px',fontSize:'14px',fontWeight:'700'}}>باحث عن عمل</a>
           <a href="/jobs" style={{background:'transparent',color:'#fff',border:'2px solid rgba(255,255,255,.4)',textDecoration:'none',padding:'10px 22px',borderRadius:'10px',fontSize:'14px',fontWeight:'700'}}>استعرض الوظائف</a>
         </div>
       </section>
