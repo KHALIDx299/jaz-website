@@ -232,7 +232,7 @@ export default function Home() {
         alignItems:'center'
       }}>
         <div style={{display:'inline-block',background:'rgba(200,131,26,.3)',border:'1px solid rgba(200,131,26,.5)',color:'#F5C06A',padding:'6px 16px',borderRadius:'20px',fontSize:'13px',marginBottom:'20px',backdropFilter:'blur(4px)'}}>✦ دليل الأعمال الرائد في المنطقة</div>
-        <h1 style={{fontSize:'clamp(28px,5vw,52px)',fontWeight:'800',color:'#fff',marginBottom:'16px',lineHeight:'1.2',textShadow:'0 2px 10px rgba(0,0,0,0.3)'}}>JAZ: تواصل مع <span style={{color:'#F5A623'}}>مستقبل جازان</span></h1>
+       <h1 style={{fontSize:'clamp(28px,5vw,52px)',fontWeight:'800',color:'#fff',marginBottom:'16px',lineHeight:'1.2',textShadow:'0 2px 10px rgba(0,0,0,0.3)'}}>جاز: تواصل مع <span style={{color:'#F5A623'}}>مستقبل جازان</span></h1>
         <p style={{color:'rgba(255,255,255,.9)',fontSize:'18px',marginBottom:'36px',textShadow:'0 1px 5px rgba(0,0,0,0.3)',maxWidth:'600px'}}>منصتك الذكية للعثور على الشركات والوظائف والفرص في جازان</p>
 
         <div style={{display:'flex',justifyContent:'center',gap:'0',marginBottom:'16px',maxWidth:'520px',width:'100%'}}>
