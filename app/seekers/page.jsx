@@ -17,27 +17,6 @@ export default function SeekersPage() {
   const [error, setError] = useState('')
   const [fieldErrors, setFieldErrors] = useState({})
 
-  const specializations = [
-    'إدارة أعمال',
-    'محاسبة ومالية',
-    'موارد بشرية',
-    'تسويق ومبيعات',
-    'تقنية المعلومات والبرمجة',
-    'هندسة (جميع التخصصات)',
-    'طب وصحة',
-    'تعليم وتدريب',
-    'قانون',
-    'إعلام واتصال',
-    'صناعة وإنتاج',
-    'نفط وغاز',
-    'لوجستيات ونقل',
-    'خدمة عملاء',
-    'تصميم وإبداع',
-    'بناء وإنشاءات',
-    'أمن وسلامة',
-    'مهن أخرى',
-  ]
-
   const experienceLevels = [
     'خريج جديد (بدون خبرة)',
     'أقل من سنة',
@@ -57,6 +36,11 @@ export default function SeekersPage() {
       else if (/\d/.test(value)) err = 'الاسم لا يحتوي على أرقام'
     }
 
+    if (name === 'specialization') {
+      if (!value.trim()) err = 'التخصص مطلوب'
+      else if (value.trim().length < 3) err = 'التخصص قصير جداً'
+    }
+
     if (name === 'phone') {
       const cleaned = value.replace(/\s/g, '')
       if (!cleaned) err = 'رقم الجوال مطلوب'
@@ -74,7 +58,6 @@ export default function SeekersPage() {
       if (!value.includes('linkedin.com')) err = 'رابط لينكدإن غير صحيح'
     }
 
-    if (name === 'specialization' && !value) err = 'اختر التخصص'
     if (name === 'experience_years' && !value) err = 'اختر مستوى الخبرة'
 
     return err
@@ -116,7 +99,6 @@ export default function SeekersPage() {
     e.preventDefault()
     setError('')
 
-    // التحقق من كل الخانات
     const errors = {}
     Object.keys(formData).forEach(key => {
       const err = validateField(key, formData[key])
@@ -233,11 +215,16 @@ export default function SeekersPage() {
 
           <div style={{ marginBottom: '20px' }}>
             <label style={labelStyle}>التخصص *</label>
-            <select name="specialization" value={formData.specialization} onChange={handleChange} style={getInputStyle(fieldErrors.specialization)}>
-              <option value="">-- اختر التخصص --</option>
-              {specializations.map(s => <option key={s} value={s}>{s}</option>)}
-            </select>
+            <input
+              type="text"
+              name="specialization"
+              value={formData.specialization}
+              onChange={handleChange}
+              style={getInputStyle(fieldErrors.specialization)}
+              placeholder="مثال: محاسب، مبرمج Python، مهندس مدني..."
+            />
             {fieldErrors.specialization && <div style={errorStyle}>⚠️ {fieldErrors.specialization}</div>}
+            <div style={hintStyle}>📌 اكتب تخصصك بدقة عشان نقدر نوصلك للفرصة المناسبة</div>
           </div>
 
           <div style={{ marginBottom: '20px' }}>
