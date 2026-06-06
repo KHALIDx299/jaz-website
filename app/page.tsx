@@ -116,7 +116,7 @@ export default function Home() {
     },
     {
       name: 'الجمعيات',
-      image: 'https://gpnkutppljklfwzmzhag.supabase.co/storage/v1/object/public/company-logos/d8acd985d8b9d98ad8a9-d8aed98ad8b1d98ad8a9.jpg',
+      image: 'https://gpnkutppljklfwzmzhag.supabase.co/storage/v1/object/public/company-logos/d8acd985d8b9d98ad8a9-d8aed98ad8b1d8a8d8a9.jpg',
       color: '#5B21B6',
       overlayColor: 'rgba(91,33,182,0.75)'
     }
@@ -291,10 +291,10 @@ export default function Home() {
       <section style={{background:'linear-gradient(135deg,#0D3B5E,#0A2A44)',padding:'80px 5%',textAlign:'center'}}>
         <h2 style={{fontSize:'clamp(22px,5vw,38px)',fontWeight:'800',color:'#fff',marginBottom:'12px'}}>ابدأ رحلتك مع JAZ اليوم</h2>
         <p style={{color:'rgba(255,255,255,.7)',fontSize:'17px',marginBottom:'36px'}}>سجّل شركتك أو اكتشف وظيفة أحلامك في جازان</p>
-        <div style={{display:'flex',gap:'14px',justifyContent:'center',flexWrap:'wrap'}}>
-          <a href="/add-company" style={{background:'#C8831A',color:'#fff',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>سجّل شركتك مجاناً</a>
-          <a href="/jobs" style={{background:'transparent',color:'#fff',border:'2px solid rgba(255,255,255,.4)',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>استعرض الوظائف</a>
-          <a href="/seekers" style={{background:'#1A5C30',color:'#fff',textDecoration:'none',padding:'14px 28px',borderRadius:'10px',fontSize:'16px',fontWeight:'700'}}>باحث عن عمل</a>
+        <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap'}}>
+          <a href="/add-company" style={{background:'transparent',color:'#fff',border:'2px solid rgba(255,255,255,.4)',textDecoration:'none',padding:'10px 22px',borderRadius:'10px',fontSize:'14px',fontWeight:'700'}}>سجّل شركتك</a>
+          <a href="/seekers" style={{background:'#C8831A',color:'#fff',border:'2px solid #C8831A',textDecoration:'none',padding:'10px 22px',borderRadius:'10px',fontSize:'14px',fontWeight:'700'}}>باحث عن عمل</a>
+          <a href="/jobs" style={{background:'transparent',color:'#fff',border:'2px solid rgba(255,255,255,.4)',textDecoration:'none',padding:'10px 22px',borderRadius:'10px',fontSize:'14px',fontWeight:'700'}}>استعرض الوظائف</a>
         </div>
       </section>
 
